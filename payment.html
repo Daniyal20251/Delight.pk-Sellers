@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delight PK - Payment</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+body{background:#f5f6fa;color:#333;padding-bottom:120px;font-size:13px;}
+
+/* Header */
+header{position: fixed; top:0; left:0; width:100%; height:55px; background:linear-gradient(135deg,#ff6a00,#ff3d00); display:flex; align-items:center; justify-content:center; color:#fff; font-size:16px; font-weight:600; box-shadow:0 3px 10px rgba(0,0,0,0.15); border-bottom-left-radius:20px; border-bottom-right-radius:20px; z-index:100;}
+.back-btn{position:absolute; left:12px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.95); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.2);}
+.back-btn img{width:18px;height:18px;}
+
+/* Container */
+.container{padding:15px;margin-top:70px;}
+.seller-info{background: linear-gradient(120deg,#fff,#ffe6e1); padding:15px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05); margin-bottom:15px;}
+.seller-info p{margin:4px 0; font-size:12px; font-weight:500; line-height:1.4;}
+
+/* Order Cards */
+.order-card{background:#fff; border-radius:15px; padding:12px; margin-bottom:12px; box-shadow:0 5px 15px rgba(0,0,0,0.05); border-left:5px solid #ff6a00; transition:transform 0.2s;}
+.order-card:hover{transform: translateY(-2px);}
+.product-box{display:flex;align-items:center;gap:10px;background:#fafafa;padding:8px;border-radius:10px;border:1px solid #eee;}
+.product-box img{width:60px;height:60px;border-radius:10px;object-fit:cover;}
+.fee-box{margin-top:8px;background:#fff4f4;padding:8px;border-radius:10px;border-left:4px solid #ff3d00;font-size:12px;line-height:1.4;}
+
+/* EasyPaisa Box */
+.easypaisa-box{background: linear-gradient(120deg,#ffecd2,#ff3d00); padding:12px; border-radius:15px; text-align:center; color:#fff; font-weight:500; font-size:14px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin:15px 0;}
+.easypaisa-box p.number{font-size:16px;font-weight:600;margin-top:4px;}
+
+/* Invoice Box */
+.invoice-box{background:#fff; padding:15px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.08); text-align:center; margin-bottom:120px;}
+.invoice-label{display:inline-block; padding:10px 20px; background:linear-gradient(135deg,#ff6a00,#ff3d00); color:#fff; border-radius:10px; font-weight:500; font-size:13px; cursor:pointer;}
+#invoicePhoto{display:none;}
+#invoicePreview{display:block; width:100%; max-height:220px; object-fit:contain; margin-top:10px; border-radius:10px; border:1px solid #eee;}
+
+/* Payout Button */
+.payout-btn{position: fixed; bottom:15px; left:50%; transform:translateX(-50%); width:90%; max-width:350px; padding:14px; background:linear-gradient(135deg,#ff6a00,#ff3d00); color:#fff; font-size:15px; font-weight:600; border:none; border-radius:22px; cursor:pointer; box-shadow:0 5px 18px rgba(0,0,0,0.2); transition:0.2s;}
+.payout-btn:hover{transform:translateX(-50%) scale(1.02);}
+
+/* Custom Toast */
+#toast{
+    display:none;
+    position: fixed;
+    top:20px;
+    right:20px;
+    background:#4f46e5;
+    color:#fff;
+    padding:12px 20px;
+    border-radius:10px;
+    box-shadow:0 5px 18px rgba(0,0,0,0.25);
+    font-weight:600;
+    font-size:14px;
+    z-index:9999;
+    opacity:0;
+    transition: opacity 0.5s ease, transform 0.3s ease;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="back-btn" onclick="history.back()"><img src="Delight icons/back.png" alt="Back"></div>
+  Payment
+</header>
+
+<div class="container">
+  <div class="seller-info" id="sellerInfo">
+    <p><strong>Seller Name:</strong> N/A</p>
+    <p><strong>Store Name:</strong> N/A</p>
+    <p><strong>Phone:</strong> N/A</p>
+  </div>
+
+  <div id="orderList"><div id="loading" style="text-align:center; margin-top:10px;">Loading orders...</div></div>
+
+  <div class="easypaisa-box">
+    Send Payment to EasyPaisa Number
+    <p class="number">03133196595</p>
+  </div>
+
+  <div class="invoice-box">
+    <label class="invoice-label" for="invoicePhoto">Upload Invoice Photo</label>
+    <input type="file" id="invoicePhoto" accept="image/*">
+    <img id="invoicePreview" src="" alt="Invoice Preview" style="display:none;">
+  </div>
+</div>
+
+<button class="payout-btn" id="payoutBtn">Submit Payout</button>
+
+<!-- Toast Notification -->
+<div id="toast"></div>
+
+<script>
+// Custom Toast function
+function showToast(message, type="success"){
+    const toast = document.getElementById("toast");
+    toast.textContent = message;
+    toast.style.background = type==="success" ? "#4f46e5" : "#b30000";
+    toast.style.display = "block";
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+
+    setTimeout(()=>{
+        toast.style.opacity="0";
+        toast.style.transform="translateY(-20px)";
+        setTimeout(()=>{ toast.style.display="none"; },500);
+    },3000);
+}
+
+// Seller info fetch
+const seller = JSON.parse(localStorage.getItem("seller"));
+if(!seller){ 
+  showToast("Please sign up first!", "error");
+  setTimeout(()=> window.location.href = "signup.html", 1500);
+}
+
+// Store name fetch
+async function getStoreName(){
+  try{
+    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/settings?phone=${seller.phone}`);
+    const data = await res.json();
+    return data.name || "N/A";
+  }catch{
+    return "N/A";
+  }
+}
+
+async function loadSellerInfo(){
+  const storeName = await getStoreName();
+  document.getElementById("sellerInfo").innerHTML = `
+    <p><strong>Seller Name:</strong> ${seller.name}</p>
+    <p><strong>Store Name:</strong> ${storeName}</p>
+    <p><strong>Phone:</strong> ${seller.phone}</p>
+  `;
+}
+loadSellerInfo();
+
+// Load orders
+let payOrders = JSON.parse(localStorage.getItem("payOrders")) || [];
+const orderList = document.getElementById("orderList");
+
+if(payOrders.length === 0){
+  orderList.innerHTML = "<p style='text-align:center; margin-top:10px;'>No orders to pay.</p>";
+} 
+else {
+  payOrders = payOrders.map(order => {
+    if (!order.paymentId) order.paymentId = "FEE-" + (order.id || Date.now());
+    return order;
+  });
+  localStorage.setItem("payOrders", JSON.stringify(payOrders));
+  orderList.innerHTML = "";
+  payOrders.forEach(order => {
+    const div = document.createElement("div");
+    div.className = "order-card";
+    const product = order.product || {};
+    const imgUrl = product.image || product.images?.[0] || "no-img.jpg";
+    div.innerHTML = `
+      <div class="product-box">
+        <img src="${imgUrl}">
+        <div>
+          <p><strong>${product.title || "Unknown Product"}</strong></p>
+          <p>Price: Rs ${product.price}</p>
+          <p>Service Fee: Rs ${order.serviceFee}</p>
+        </div>
+      </div>
+      <div class="fee-box">
+        <p><strong>Payment ID:</strong> ${order.paymentId}</p>
+        <p><strong>Status:</strong> ${order.paymentStatus || "pending"}</p>
+      </div>
+    `;
+    orderList.appendChild(div);
+  });
+}
+
+// Invoice preview
+document.getElementById("invoicePhoto").addEventListener("change", e => {
+  const file = e.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById("invoicePreview").src = reader.result;
+      document.getElementById("invoicePreview").style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Submit payout
+document.getElementById("payoutBtn").addEventListener("click", async () => {
+  const invoiceFile = document.getElementById("invoicePhoto").files[0];
+  if(!invoiceFile){
+    showToast("Please upload invoice photo.", "error");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const invoiceBase64 = reader.result;
+
+    const payoutData = {
+      seller,
+      storeName: await getStoreName(),
+      orders: payOrders,
+      invoicePhoto: invoiceBase64,
+      invoiceName: invoiceFile.name,
+      timestamp: new Date().toISOString()
+    };
+
+    const res = await fetch("https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payoutData)
+    });
+
+    const result = await res.json();
+    if(result.success){
+      showToast("Payment request submitted! Please wait 24 hours.", "success");
+      localStorage.removeItem("payOrders");
+      setTimeout(()=> window.location.href="RENT.html", 1500);
+    } else {
+      showToast("Error: " + result.message, "error");
+    }
+  };
+  reader.readAsDataURL(invoiceFile);
+});
+</script>
+</body>
+</html>

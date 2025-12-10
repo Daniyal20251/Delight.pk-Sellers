@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Your Store</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    background:#f4f4f9;
+    padding: 20px;
+  }
+  .container {
+    background:white;
+    padding:30px 25px;
+    border-radius:12px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    width:100%;
+    max-width:380px;
+    text-align:center;
+  }
+  h2 { color:#ef6c00; margin-bottom:25px; font-size:24px; }
+  .profile-pic {
+    width: 120px; height: 120px; border-radius: 50%;
+    background-color: #686868;
+    display: flex; justify-content: center; align-items: center;
+    margin: 0 auto 20px auto; position: relative; cursor: pointer; overflow: hidden;
+  }
+  .plus-sign {
+    font-size: 48px; color: white; font-weight: bold;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.6); position: absolute;
+    transition: 0.2s;
+  }
+  .profile-pic:hover .plus-sign { transform: scale(1.1); }
+  .profile-pic img { width:100%; height:100%; object-fit:cover; display:none; }
+  input[type="text"] { width:100%; padding:12px 15px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc; font-size:16px; }
+  button { width:100%; background:#ef6c00; color:white; border:none; padding:12px 0; border-radius:10px; cursor:pointer; font-size:16px; transition:0.3s; }
+  button:hover { background:#d85c00; }
+  .file-input { display:none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>🛍️ Create Your Store</h2>
+  <label for="file-upload">
+    <div class="profile-pic">
+      <span class="plus-sign">+</span>
+      <img id="profile-img" src="">
+    </div>
+  </label>
+  <input type="file" id="file-upload" class="file-input" accept="image/*">
+  <input type="text" id="storeName" placeholder="Enter your Store Name">
+  <button onclick="createStore()">Save & Continue</button>
+</div>
+
+<script>
+const fileInput = document.getElementById('file-upload');
+const profileImg = document.getElementById('profile-img');
+const plusSign = document.querySelector('.plus-sign');
+const storeInput = document.getElementById('storeName');
+
+let selectedFile = null;
+
+// ✅ Check if seller is logged in
+const seller = JSON.parse(localStorage.getItem("seller"));
+if(!seller){
+  alert("⚠️ You must login first!");
+  window.location.href = "login.html";
+}
+
+// ✅ Load existing store settings from backend
+async function loadSettings() {
+  try {
+    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/settings?phone=${seller.phone}`);
+    const data = await res.json();
+    if(data.logo){
+      profileImg.src = data.logo;
+      profileImg.style.display = "block";
+      plusSign.style.display = "none";
+    }
+    if(data.name) storeInput.value = data.name;
+  } catch(err){
+    console.error("Cannot fetch settings:", err);
+  }
+}
+window.onload = loadSettings;
+
+// ✅ Profile picture preview
+fileInput.addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(file){
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      profileImg.src = evt.target.result;
+      profileImg.style.display = "block";
+      plusSign.style.display = "none";
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+// ✅ Save store
+async function createStore() {
+  const storeName = storeInput.value.trim();
+  if(!storeName){
+    alert("⚠️ Please enter a store name!");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("phone", seller.phone); // MUST send phone
+  formData.append("name", storeName);
+  if(selectedFile) formData.append("logo", selectedFile);
+
+  try {
+    const res = await fetch("https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/update-settings", {
+      method:"POST",
+      body: formData
+    });
+    const data = await res.json();
+    if(data.success){
+      alert("✅ Store created/updated successfully!");
+      window.location.href = "SellerProfile.html";
+    } else {
+      alert("⚠️ " + (data.message || "Something went wrong"));
+    }
+  } catch(err){
+    console.error(err);
+    alert("⚠️ Backend not reachable!");
+  }
+}
+</script>
+
+</body>
+</html>

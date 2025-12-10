@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seller Profile - Delight.pk</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',sans-serif;background:#f4f6f8;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:30px 15px 80px;}
+.container{background:#fff;border-radius:16px;box-shadow:0 4px 14px rgba(0,0,0,0.1);padding:25px 20px 30px;max-width:430px;width:100%;}
+h2{color:#ef6c00;text-align:center;margin-bottom:25px;font-size:22px;}
+.profile-row{display:flex;align-items:center;gap:15px;margin-bottom:25px;}
+.profile-pic{width:90px;height:90px;border-radius:50%;overflow:hidden;background:#eee;box-shadow:0 4px 10px rgba(0,0,0,0.2);cursor:pointer;position:relative;flex-shrink:0;}
+.profile-pic img{width:100%;height:100%;object-fit:cover;}
+.plus-sign{font-size:32px;color:white;font-weight:bold;text-shadow:0 2px 6px rgba(0,0,0,0.6);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);}
+.info-box{flex-grow:1;}
+.info-box input{width:100%;border:1px solid #ccc;border-radius:10px;padding:10px 12px;font-size:15px;background:#fafafa;}
+label{display:block;font-weight:600;margin-bottom:6px;color:#333;}
+input[type="number"]{width:100%;padding:10px 12px;border:1px solid #ccc;border-radius:10px;font-size:15px;margin-bottom:14px;}
+button{width:100%;background:#ef6c00;color:white;border:none;padding:12px 0;border-radius:10px;font-size:16px;cursor:pointer;transition:0.3s;margin-top:10px;}
+button:hover{background:#d55c00;}
+#welcomeText{text-align:center;margin-top:15px;color:#ef6c00;font-size:18px;font-weight:bold;}
+.bar{position:fixed;bottom:0;left:0;width:100%;background:#ef6c00;display:flex;justify-content:space-around;align-items:center;padding:14px 0;z-index:9999;box-shadow:0 -2px 6px rgba(0,0,0,0.2);}
+.bar a{text-decoration:none;color:white;text-align:center;font-size:15px;font-weight:bold;}
+.bar i{display:block;font-size:20px;margin-bottom:3px;}
+</style>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<div class="container">
+  <h2>Seller Profile</h2>
+
+  <div class="profile-row">
+    <div class="profile-pic" id="profilePicContainer">
+      <span class="plus-sign">+</span>
+      <img id="profile-img" src="">
+    </div>
+    <div class="info-box">
+      <input type="text" id="storeName" style="color:black;" placeholder="Your Store Name">
+    </div>
+  </div>
+
+  <input type="file" id="file-upload" accept="image/*" style="display:none">
+  
+  <label for="deliveryInput">Delivery Charges (Rs.)</label>
+  <input type="number" id="deliveryInput" placeholder="200">
+
+  <button onclick="updateProfile()">Save & Continue</button>
+  <button id="uploadBtn" onclick="goToSellerPanel()">Upload Product</button>
+  <button onclick="openRentPage()">Manage Rentals</button>
+
+  <h2 id="welcomeText"></h2>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="bar">
+  <a href="myStore.html" onclick="goToMyStore()"><i class="fas fa-store"></i>Store</a>
+  <a href="sellerOrders.html" onclick="goToOrders()"><i class="fas fa-box"></i>My Orders</a>
+  <a href="SellerProfile.html"><i class="fas fa-user"></i>Profile</a>
+</div>
+
+<script>
+const profileImg = document.getElementById("profile-img");
+const plusSign = document.querySelector(".plus-sign");
+const storeInput = document.getElementById("storeName");
+const fileInput = document.getElementById("file-upload");
+const profileContainer = document.getElementById("profilePicContainer");
+const deliveryInput = document.getElementById("deliveryInput");
+
+profileContainer.addEventListener("click", ()=> fileInput.click());
+
+// ✅ Login check
+const seller = JSON.parse(localStorage.getItem("seller"));
+if(!seller){
+  window.location.href="signup.html";
+}
+
+// ✅ Load existing settings
+async function loadSettings(){
+  try{
+    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/settings?phone=${seller.phone}`);
+    const data = await res.json();
+    if(data.logo){ profileImg.src=data.logo; profileImg.style.display="block"; plusSign.style.display="none"; }
+    if(data.name){ storeInput.value=data.name; document.getElementById("welcomeText").innerText="Hello, "+data.name+" 👋"; }
+    else { document.getElementById("welcomeText").innerText="Hello, "+(seller.name || "Seller")+" 👋"; }
+    if(data.delivery){ deliveryInput.value = data.delivery; }
+  }catch(err){ console.error(err); }
+}
+window.onload = loadSettings;
+
+// ✅ Update profile
+async function updateProfile(){
+  const formData = new FormData();
+  formData.append("phone", seller.phone);
+  formData.append("name", storeInput.value);
+  formData.append("delivery", deliveryInput.value);
+  if(fileInput.files[0]) formData.append("logo", fileInput.files[0]);
+
+  try{
+    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/update-settings`, { method:"POST", body:formData });
+    const data = await res.json();
+
+    if(data.success){ 
+      document.getElementById("welcomeText").innerText="Hello, "+storeInput.value+" 👋"; 
+      if(data.seller.logo) profileImg.src = data.seller.logo;
+      plusSign.style.display="none";
+      alert("✅ Store updated successfully!");
+    } else { alert("⚠️ "+(data.message || "Something went wrong")); }
+  }catch(err){ console.error(err); alert("⚠️ Cannot update store"); }
+}
+
+// ✅ Go to Seller Panel
+function goToSellerPanel(){ 
+  window.location.href="Seller Panel.html"; 
+}
+
+// ✅ My Store from bar
+function goToMyStore(){
+  localStorage.setItem("sellerPhone", seller.phone);
+  window.location.href="myStore.html";
+}
+
+// ✅ Go to Orders Page
+function goToOrders(){ 
+  localStorage.setItem("sellerOrdersData", JSON.stringify({name: storeInput.value || seller.name, phone: seller.phone}));
+  window.location.href="sellerOrders.html";
+}
+
+// ✅ Logout (only seller)
+function logout(){ 
+  localStorage.removeItem("seller"); // ✅ sirf seller logout hoga
+  window.location.href="login.html"; 
+}
+function openRentPage(){
+  window.location.href = "RENT.html";
+}
+</script>
+
+</body>
+</html>

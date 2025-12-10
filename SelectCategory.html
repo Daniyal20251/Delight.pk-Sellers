@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select Category - Delight.pk</title>
+<style>
+  body {
+    font-family:'Segoe UI',sans-serif;
+    background:#f9f9f9;
+    padding:10px;
+    max-width:480px;
+    margin:auto;
+  }
+  h2 {
+    color:#ef6c00;
+    border-bottom:2px solid #ef6c00;
+    padding-bottom:3px;
+    margin-bottom:10px;
+    font-size:20px;
+  }
+  .category-card {
+    background:#fff;
+    border:1px solid #ccc;
+    border-radius:6px;
+    margin-bottom:5px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:0.2s;
+    font-size:13px;
+  }
+  .category-card:hover {
+    box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  }
+  .category-header {
+    padding:8px 10px;
+    font-weight:bold;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#ef6c00;
+    color:white;
+    font-size:14px;
+  }
+  .subcategory-list {
+    display:none;
+    padding:6px 10px;
+    background:#fff7e6;
+    font-size:12px;
+  }
+  .subcategory-list div {
+    padding:6px 0;
+    border-bottom:1px solid #ffd699;
+    cursor:pointer;
+  }
+  .subcategory-list div:last-child {
+    border-bottom:none;
+  }
+  .subcategory-list div:hover {
+    background:#ffe0b3;
+  }
+
+  .subcategory-list div {
+    flex:0 0 auto;
+    padding:6px 12px;
+    margin-right:6px;
+    background:#fff;
+    border:1px solid #ffd699;
+    border-radius:6px;
+    white-space:nowrap;
+  }
+  .home-living-subitems div:hover {
+    background:#ffe0b3;
+  }
+</style>
+</head>
+<body>
+
+<h2>Select Category</h2>
+
+<!-- 1. Men Fashion -->
+<div class="category-card">
+  <div class="category-header">Men Fashion 👕 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Men Fashion - T-Shirts">T-Shirts</div>
+    <div data-value="Men Fashion - Jeans">Jeans</div>
+    <div data-value="Men Fashion - Shoes">Shoes</div>
+    <div data-value="Men Fashion - Watches">Watches</div>
+    <div data-value="Men Fashion - Caps">Caps</div>
+  </div>
+</div>
+
+<!-- 2. Women Fashion -->
+<div class="category-card">
+  <div class="category-header">Women Fashion 👗 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Women Fashion - Dresses">Dresses</div>
+    <div data-value="Women Fashion - Handbags">Handbags</div>
+    <div data-value="Women Fashion - Jewelry Sets">Jewelry Sets</div>
+    <div data-value="Women Fashion - Sandals">Sandals</div>
+    <div data-value="Women Fashion - Makeup Kits">Makeup Kits</div>
+  </div>
+</div>
+
+<!-- 3. Mobiles -->
+<div class="category-card">
+  <div class="category-header">Mobiles 📱 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Mobiles - Smartphones">Smartphones</div>
+    <div data-value="Mobiles - Keypad Phones">Keypad Phones</div>
+    <div data-value="Mobiles - Mobile Covers">Mobile Covers</div>
+    <div data-value="Mobiles - Chargers">Chargers</div>
+    <div data-value="Mobiles - Earbuds">Earbuds</div>
+  </div>
+</div>
+
+<!-- 4. Mobile Accessories -->
+<div class="category-card">
+  <div class="category-header">Mobile Accessories 🔌 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Mobile Accessories - Power Banks">Power Banks</div>
+    <div data-value="Mobile Accessories - Smart Watches">Smart Watches</div>
+    <div data-value="Mobile Accessories - Data Cables">Data Cables</div>
+    <div data-value="Mobile Accessories - Earphones">Earphones</div>
+    <div data-value="Mobile Accessories - Stands & Holders">Stands & Holders</div>
+  </div>
+</div>
+
+<!-- 5. Electronics -->
+<div class="category-card">
+  <div class="category-header">Electronics ⚡ <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Electronics - LED TV">LED TV</div>
+    <div data-value="Electronics - Bluetooth Speakers">Bluetooth Speakers</div>
+    <div data-value="Electronics - Headphones">Headphones</div>
+    <div data-value="Electronics - Cameras">Cameras</div>
+    <div data-value="Electronics - Smart Gadgets">Smart Gadgets</div>
+  </div>
+</div>
+
+<!-- 6. Beauty Products -->
+<div class="category-card">
+  <div class="category-header">Beauty Products 💄 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Beauty Products - Perfumes">Perfumes</div>
+    <div data-value="Beauty Products - Lipsticks">Lipsticks</div>
+    <div data-value="Beauty Products - Face Creams">Face Creams</div>
+    <div data-value="Beauty Products - Hair Oils">Hair Oils</div>
+    <div data-value="Beauty Products - Makeup Brushes">Makeup Brushes</div>
+  </div>
+</div>
+
+<!-- 7. Home & Living (Daraz-style) -->
+<div class="category-card">
+  <div class="category-header">Home & Living 🏠 <span>▼</span></div>
+  <div class="subcategory-list home-living-subitems">
+    <div data-value="Home & Living - Home Gadgets">Home Gadgets</div>
+    <div data-value="Home & Living - Cleaning Tools">Cleaning Tools</div>
+    <div data-value="Home & Living - Kitchen Accessories">Kitchen Accessories</div>
+    <div data-value="Home & Living - Room Decor">Room Decor</div>
+    <div data-value="Home & Living - Small Appliances">Small Appliances</div>
+  </div>
+</div>
+
+<!-- 8. Watches -->
+<div class="category-card">
+  <div class="category-header">Watches ⌚ <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Watches - Smart Watches">Smart Watches</div>
+    <div data-value="Watches - Digital Watches">Digital Watches</div>
+    <div data-value="Watches - Analog Watches">Analog Watches</div>
+    <div data-value="Watches - Couple Watches">Couple Watches</div>
+    <div data-value="Watches - Fitness Bands">Fitness Bands</div>
+  </div>
+</div>
+
+<!-- 9. Shoes -->
+<div class="category-card">
+  <div class="category-header">Shoes 👟 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Shoes - Sneakers">Sneakers</div>
+    <div data-value="Shoes - Sandals">Sandals</div>
+    <div data-value="Shoes - Joggers">Joggers</div>
+    <div data-value="Shoes - Slippers">Slippers</div>
+    <div data-value="Shoes - Formal Shoes">Formal Shoes</div>
+  </div>
+</div>
+
+<!-- 10. Bags -->
+<div class="category-card">
+  <div class="category-header">Bags 👜 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Bags - School Bags">School Bags</div>
+    <div data-value="Bags - Laptop Bags">Laptop Bags</div>
+    <div data-value="Bags - Hand Bags">Hand Bags</div>
+    <div data-value="Bags - Travel Bags">Travel Bags</div>
+    <div data-value="Bags - Wallets">Wallets</div>
+  </div>
+</div>
+
+<!-- 11. Jewelry -->
+<div class="category-card">
+  <div class="category-header">Jewelry 💍 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Jewelry - Rings">Rings</div>
+    <div data-value="Jewelry - Necklaces">Necklaces</div>
+    <div data-value="Jewelry - Earrings">Earrings</div>
+    <div data-value="Jewelry - Bracelets">Bracelets</div>
+    <div data-value="Jewelry - Anklets">Anklets</div>
+  </div>
+</div>
+
+<!-- 12. Baby Products -->
+<div class="category-card">
+  <div class="category-header">Baby Products 🧸 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Baby Products - Baby Toys">Baby Toys</div>
+    <div data-value="Baby Products - Baby Clothes">Baby Clothes</div>
+  </div>
+</div>
+
+<!-- 13. Sports Items -->
+<div class="category-card">
+  <div class="category-header">Sports Items 🏋️ <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Sports Items - Gym Gloves">Gym Gloves</div>
+    <div data-value="Sports Items - Water Bottles">Water Bottles</div>
+    <div data-value="Sports Items - Dumbbells">Dumbbells</div>
+    <div data-value="Sports Items - Football">Football</div>
+    <div data-value="Sports Items - Yoga Mats">Yoga Mats</div>
+  </div>
+</div>
+
+<!-- 14. Gaming -->
+<div class="category-card">
+  <div class="category-header">Gaming 🎮 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Gaming - Gamepads">Gamepads</div>
+    <div data-value="Gaming - Gaming Headsets">Gaming Headsets</div>
+    <div data-value="Gaming - PS5 / Xbox Accessories">PS5 / Xbox Accessories</div>
+    <div data-value="Gaming - Mouse Pads">Mouse Pads</div>
+    <div data-value="Gaming - Gaming Keyboards">Gaming Keyboards</div>
+  </div>
+</div>
+
+<!-- 15. Computer Accessories -->
+<div class="category-card">
+  <div class="category-header">Computer Accessories 💻 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Computer Accessories - Keyboards">Keyboards</div>
+    <div data-value="Computer Accessories - Mouse">Mouse</div>
+    <div data-value="Computer Accessories - USB Drives">USB Drives</div>
+    <div data-value="Computer Accessories - Headsets">Headsets</div>
+    <div data-value="Computer Accessories - Laptop Stands">Laptop Stands</div>
+  </div>
+</div>
+
+<!-- 16. Other -->
+<div class="category-card">
+  <div class="category-header">Other 🛒 <span>▼</span></div>
+  <div class="subcategory-list">
+    <div data-value="Other Things">Other Things</div>
+  </div>
+</div>
+
+<script>
+// Accordion toggle
+document.querySelectorAll('.category-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const sublist = header.nextElementSibling;
+    // Close all other sublists
+    document.querySelectorAll('.subcategory-list').forEach(list => {
+      if(list !== sublist) list.style.display = 'none';
+    });
+    sublist.style.display = sublist.style.display === 'block' ? 'none' : 'block';
+  });
+});
+
+// Subcategory select
+document.querySelectorAll('.subcategory-list div').forEach(item => {
+  item.addEventListener('click', () => {
+    const selected = item.dataset.value;
+    localStorage.setItem('selectedCategory', selected);
+    window.location.href = 'Seller Panel.html';
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="login.css">
+  <title>www.delight.pk - Login</title>
+</head>
+<body>
+  <div class="delight">
+    <h2>Welcome Back 👋</h2>
+    <h2>TO</h2>
+    <h1>DELIGHT SHOP🛍</h1>
+  </div>
+
+  <div class="logo">
+    <img src="Delight icons/Logo.png" width="200" height="200" alt="Delight.logo">
+  </div>
+
+  <div class="login">
+    <h3>Login</h3>
+    <form id="loginForm">
+      <input type="number" id="phone" required placeholder="Enter your phone number" minlength="11" maxlength="11"><br>
+      <input type="password" id="pass" required placeholder="Enter your password"><br>
+      <input type="submit" value="Login">
+    </form>
+
+    <p style="margin-top:12px; font-size:13px; text-align:center;">
+      Don’t have an account?
+      <a href="signup.html" style="color:#ef6c00; text-decoration:none; font-weight:bold;">
+        ✍️ Sign Up
+      </a>
+    </p>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", async function(event){
+      event.preventDefault();
+
+      const phone = document.getElementById("phone").value.trim();
+      const pass = document.getElementById("pass").value.trim();
+
+      if (phone.length !== 11 || pass.length < 6) {
+        alert("⚠️ Please enter valid phone and password!");
+        return;
+      }
+
+      const payload = { phone, password: pass };
+
+      try {
+        const baseUrl = "https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev"; // backend URL
+        const res = await fetch(baseUrl + "/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          // ✅ Save seller info locally
+          const sellerData = { phone };
+          
+          localStorage.setItem("seller", JSON.stringify(sellerData));
+          localStorage.setItem("sellerPhone", phone);
+          localStorage.setItem("token", data.token); // store JWT if needed for auth later
+
+          alert("✅ Login successful!");
+          window.location.href = "SP.Name.html"; // redirect to Seller Profile setup
+        } else {
+          alert(data.message || "❌ Invalid credentials. Try again.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Error connecting to backend. Please check your server.");
+      }
+    });
+  </script>
+</body>
+</html>

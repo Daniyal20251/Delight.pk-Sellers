@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delight.pk Seller Panel</title>
+<style>
+  body {
+    font-family:'Segoe UI',sans-serif;
+    background:#f9f9f9;
+    padding:20px;
+    max-width:600px;
+    margin:auto;
+    margin-right: 12px;
+  }
+  h3 {
+    color:#ef6c00;
+    border-bottom:2px solid #ef6c00;
+    padding-bottom:5px;
+  }
+  label {
+    font-weight:bold;
+    display:block;
+    margin-top:15px;
+  }
+  input[type="text"], textarea {
+    width:100%;
+    padding:8px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-top:5px;
+  }
+  input[readonly] {
+    background:#fff8e6;
+    cursor:pointer;
+  }
+  .fileUpload {
+    position:relative;
+    display:inline-block;
+    overflow:hidden;
+    background:#ef6c00;
+    color:white;
+    border-radius:8px;
+    padding:8px 14px;
+    cursor:pointer;
+    font-size:14px;
+    margin-top:10px;
+    margin-right:10px;
+  }
+  .fileUpload input[type="file"] {
+    position:absolute;
+    left:0;
+    top:0;
+    opacity:0;
+    cursor:pointer;
+    width:100%;
+    height:100%;
+  }
+  button {
+    background:#ef6c00;
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:20px;
+    margin-right:10px;
+    font-weight:bold;
+  }
+  .preview-container img, .preview-container video {
+    width:80px;
+    height:80px;
+    object-fit:cover;
+    margin:5px;
+    border-radius:8px;
+    border:1px solid #ddd;
+  }
+  .preview-container {
+    display:flex;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  .success {
+    background:#e8f5e9;
+    border:1px solid #4caf50;
+    color:#2e7d32;
+    padding:10px;
+    border-radius:8px;
+    display:none;
+    margin-top:15px;
+  }
+</style>
+</head>
+<body>
+
+<h3>Add New Product</h3>
+
+<form id="productForm">
+
+  <label>Title:</label>
+  <input type="text" id="title" placeholder="Product Title">
+
+  <label>Price:</label>
+  <input type="text" id="price" placeholder="999">
+
+  <label>Discount (Rs.):</label>
+  <input type="text" id="discount" placeholder="100">
+
+  <label>Color:</label>
+  <input type="text" id="color" placeholder="Example: Red, Blue, Black">
+
+  <label>Size:</label>
+  <input type="text" id="size" placeholder="Example: Small, Medium, Large">
+
+  <label>Description:</label>
+  <textarea id="description" rows="6" placeholder="Product description here..."></textarea>
+
+  <label>Category:</label>
+  <input type="text" id="selectedCategoryInput" placeholder="Choose Category" readonly>
+
+  <label>Select Product Images (12 max):</label>
+  <div id="imageInputs"></div>
+  <div class="preview-container" id="imagePreview"></div>
+
+  <label>Select Product Videos (3 max):</label>
+  <div id="videoInputs"></div>
+  <div class="preview-container" id="videoPreview"></div>
+
+  <button type="submit">Upload Product</button>
+</form>
+
+<div id="successBox" class="success">✅ Product uploaded successfully!</div>
+
+<script>
+// ✅ Seller login check
+const sellerData = JSON.parse(localStorage.getItem("seller"));
+const sellerPhone = sellerData ? sellerData.phone : null;
+if (!sellerPhone) {
+  alert("⚠️ Please login first!");
+  window.location.href = "login.html";
+}
+
+// ✅ Auto Save Inputs
+const fields = ["title", "price", "discount", "color", "size", "description"];
+fields.forEach(id => {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => {
+    const saved = JSON.parse(localStorage.getItem("tempProductData") || "{}");
+    saved[id] = el.value;
+    localStorage.setItem("tempProductData", JSON.stringify(saved));
+  });
+});
+
+// ✅ Restore saved data
+window.addEventListener("DOMContentLoaded", () => {
+  const savedData = JSON.parse(localStorage.getItem("tempProductData") || "{}");
+  Object.keys(savedData).forEach(key => {
+    if (document.getElementById(key)) {
+      document.getElementById(key).value = savedData[key];
+    }
+  });
+
+  document.getElementById("selectedCategoryInput").value =
+    localStorage.getItem("selectedCategory") || "";
+});
+
+// ✅ When selecting category
+document.getElementById("selectedCategoryInput").addEventListener("click", () => {
+  window.open("SelectCategory.html", "_blank", "width=400,height=600");
+});
+
+// ================= IMAGE SECTION =================
+const imagePreviewBox = document.getElementById("imagePreview");
+const imageInputsDiv = document.getElementById("imageInputs");
+
+for (let i = 0; i < 12; i++) {
+  const label = document.createElement("label");
+  label.className = "fileUpload";
+  label.innerHTML = `Upload Image ${i + 1}`;
+  
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.className = "imgInput";
+  input.dataset.index = i;
+
+  label.appendChild(input);
+  imageInputsDiv.appendChild(label);
+}
+
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("imgInput")) {
+    const index = e.target.dataset.index;
+    const file = e.target.files[0];
+
+    if (file) {
+      let previewSlot = document.getElementById("imgPreview" + index);
+
+      if (!previewSlot) {
+        previewSlot = document.createElement("img");
+        previewSlot.id = "imgPreview" + index;
+        imagePreviewBox.appendChild(previewSlot);
+      }
+
+      previewSlot.src = URL.createObjectURL(file);
+    }
+  }
+});
+
+// ================= VIDEO SECTION =================
+const videoPreviewBox = document.getElementById("videoPreview");
+const videoInputsDiv = document.getElementById("videoInputs");
+
+for (let i = 0; i < 3; i++) {
+  const label = document.createElement("label");
+  label.className = "fileUpload";
+  label.innerHTML = `Upload Video ${i + 1}`;
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "video/*";
+  input.className = "videoInput";
+  input.dataset.index = i;
+
+  label.appendChild(input);
+  videoInputsDiv.appendChild(label);
+}
+
+document.addEventListener("change", function(e) {
+  if (e.target.classList.contains("videoInput")) {
+    const index = e.target.dataset.index;
+    const file = e.target.files[0];
+
+    if (file) {
+      let previewSlot = document.getElementById("videoPreviewSlot" + index);
+
+      if (!previewSlot) {
+        previewSlot = document.createElement("video");
+        previewSlot.id = "videoPreviewSlot" + index;
+        previewSlot.controls = true;
+        videoPreviewBox.appendChild(previewSlot);
+      }
+
+      previewSlot.src = URL.createObjectURL(file);
+    }
+  }
+});
+
+// ✅ Submit Product
+document.getElementById("productForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  
+  const selectedCategory = localStorage.getItem("selectedCategory");
+  if (!selectedCategory) {
+    alert("⚠️ Please select a category!");
+    return;
+  }
+
+  const title = document.getElementById("title").value.trim();
+  const price = document.getElementById("price").value.trim();
+
+  if (!title || !price) {
+    alert("⚠️ Title and price are required!");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("sellerPhone", sellerPhone);
+  formData.append("category", selectedCategory);
+  fields.forEach(id => {
+    formData.append(id, document.getElementById(id).value.trim());
+  });
+
+  document.querySelectorAll(".imgInput").forEach(input => {
+    if (input.files[0]) formData.append("images", input.files[0]);
+  });
+
+  document.querySelectorAll(".videoInput").forEach(input => {
+    if (input.files[0]) formData.append("videos", input.files[0]);
+  });
+
+  try {
+    const res = await fetch("https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/add-product", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById("successBox").style.display = "block";
+      document.getElementById("productForm").reset();
+      imagePreviewBox.innerHTML = "";
+      videoPreviewBox.innerHTML = "";
+
+      localStorage.removeItem("selectedCategory");
+      localStorage.removeItem("tempProductData");
+    } else {
+      alert("❌ Upload failed: " + (data.message || ""));
+    }
+  } catch (err) {
+    console.error(err);
+    alert("⚠️ Error connecting to backend.");
+  }
+});
+</script>
+
+</body>
+</html>
