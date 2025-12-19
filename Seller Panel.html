@@ -89,6 +89,36 @@
     display:none;
     margin-top:15px;
   }
+  /* 🔵 FULL PAGE LOADING */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+/* 🔄 ROUND SPINNER */
+.spinner{
+  width:30px;
+  height:30px;
+  border:6px solid #ffe0b2;
+  border-top:6px solid #ef6c00;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
 </style>
 </head>
 <body>
@@ -128,6 +158,11 @@
 
   <button type="submit">Upload Product</button>
 </form>
+
+<!-- 🔵 LOADING SCREEN -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+</div>
 
 <div id="successBox" class="success">✅ Product uploaded successfully!</div>
 
@@ -247,9 +282,15 @@ document.addEventListener("change", function(e) {
 });
 
 // ✅ Submit Product
+const uploadBtn = document.querySelector("button[type='submit']");
+const loading = document.getElementById("loading");
+
 document.getElementById("productForm").addEventListener("submit", async function(e) {
   e.preventDefault();
-  
+
+  // ❌ double click block
+  if (uploadBtn.disabled) return;
+
   const selectedCategory = localStorage.getItem("selectedCategory");
   if (!selectedCategory) {
     alert("⚠️ Please select a category!");
@@ -263,6 +304,10 @@ document.getElementById("productForm").addEventListener("submit", async function
     alert("⚠️ Title and price are required!");
     return;
   }
+
+  // 🔒 LOCK UI
+  uploadBtn.disabled = true;
+  loading.style.display = "flex";
 
   const formData = new FormData();
   formData.append("sellerPhone", sellerPhone);
@@ -280,11 +325,13 @@ document.getElementById("productForm").addEventListener("submit", async function
   });
 
   try {
-    const res = await fetch("https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/add-product", {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(
+      "https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/add-product",
+      { method: "POST", body: formData }
+    );
+
     const data = await res.json();
+
     if (data.success) {
       document.getElementById("successBox").style.display = "block";
       document.getElementById("productForm").reset();
@@ -297,9 +344,12 @@ document.getElementById("productForm").addEventListener("submit", async function
       alert("❌ Upload failed: " + (data.message || ""));
     }
   } catch (err) {
-    console.error(err);
     alert("⚠️ Error connecting to backend.");
   }
+
+  // 🔓 UNLOCK UI
+  uploadBtn.disabled = false;
+  loading.style.display = "none";
 });
 </script>
 
