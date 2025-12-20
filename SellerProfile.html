@@ -79,7 +79,7 @@ if(!seller){
 // ✅ Load existing settings
 async function loadSettings(){
   try{
-    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/settings?phone=${seller.phone}`);
+    const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/settings?phone=${seller.phone}`);
     const data = await res.json();
     if(data.logo){ profileImg.src=data.logo; profileImg.style.display="block"; plusSign.style.display="none"; }
     if(data.name){ storeInput.value=data.name; document.getElementById("welcomeText").innerText="Hello, "+data.name+" 👋"; }
@@ -98,7 +98,7 @@ async function updateProfile(){
   if(fileInput.files[0]) formData.append("logo", fileInput.files[0]);
 
   try{
-    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/update-settings`, { method:"POST", body:formData });
+    const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/update-settings`, { method:"POST", body:formData });
     const data = await res.json();
 
     if(data.success){ 

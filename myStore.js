@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     // ✅ Fetch stores
     const storeRes = await fetch(
-      "https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/all-stores"
+      "https://delight-backend--araindaniyalo2.replit.app/all-stores"
     );
     const allStores = await storeRes.json();
 
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ✅ Fetch products
     const res = await fetch(
-      `https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/products/${sellerPhone}`
+      `https://delight-backend--araindaniyalo2.replit.app/products/${sellerPhone}`
     );
     allProducts = await res.json();
 
@@ -115,7 +115,7 @@ function renderProducts(list) {
 
       try {
         const res = await fetch(
-          `https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/products/${item.id}`,
+          `https://delight-backend--araindaniyalo2.replit.app/products/${item.id}`,
           { method: "DELETE" }
         );
 

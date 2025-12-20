@@ -119,7 +119,7 @@ if(!seller){
 // Store name fetch
 async function getStoreName(){
   try{
-    const res = await fetch(`https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/settings?phone=${seller.phone}`);
+    const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/settings?phone=${seller.phone}`);
     const data = await res.json();
     return data.name || "N/A";
   }catch{
@@ -208,7 +208,7 @@ document.getElementById("payoutBtn").addEventListener("click", async () => {
       timestamp: new Date().toISOString()
     };
 
-    const res = await fetch("https://5238f098-6b7a-4815-b792-a10ea88e4c13-00-54fclrw8sb5.pike.replit.dev/payment", {
+    const res = await fetch("https://delight-backend--araindaniyalo2.replit.app/payment", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payoutData)
