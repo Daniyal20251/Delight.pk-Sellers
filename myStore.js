@@ -11,6 +11,7 @@ const searchInput = document.getElementById("searchInput");
 const searchPanel = document.getElementById("searchPanel");
 const recentList = document.getElementById("recentSearches");
 const clearBtn = document.getElementById("clearHistoryBtn");
+const page = location.pathname.split("/").pop();
 
 // 🔹 Recent searches
 let recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
@@ -223,3 +224,13 @@ clearBtn.addEventListener("click", () => {
   recentSearches = [];
   renderRecentSearches();
 });
+
+  if(page === "myStore.html") {
+    document.getElementById("nav-store")?.classList.add("active");
+  }
+  if(page === "sellerOrders.html") {
+    document.getElementById("nav-orders")?.classList.add("active");
+  }
+  if(page === "SellerProfile.html") {
+    document.getElementById("nav-profile")?.classList.add("active");
+  }
