@@ -70,36 +70,9 @@ header h4 { color:#fff; font-size:21px; font-weight:600; text-shadow:0 1px 3px r
 /* Loading */
 #loading { text-align:center; margin-top:40px; color:#555; }
 
-.bottom-bar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#ef6c00;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 0;
-  z-index:9999;
-  box-shadow:0 -2px 8px rgba(0,0,0,0.25);
-}
-
-.bottom-bar a{
-  color:white;
-  text-decoration:none;
-  font-size:14px;
-  font-weight:600;
-  text-align:center;
-}
-
-.bottom-bar i{
-  display:block;
-  font-size:20px;
-  margin-bottom:4px;
-}
-
-.bottom-bar a.active{
-  color:#ffe0b2;
-}
+.bar{position:fixed;bottom:0;left:0;width:100%;background:#ef6c00;display:flex;justify-content:space-around;align-items:center;padding:14px 0;z-index:9999;box-shadow:0 -2px 6px rgba(0,0,0,0.2);}
+.bar a{text-decoration:none;color:white;text-align:center;font-size:15px;font-weight:bold;}
+.bar i{display:block;font-size:20px;margin-bottom:3px;}
 </style>
 </head>
 <body>
@@ -115,7 +88,7 @@ header h4 { color:#fff; font-size:21px; font-weight:600; text-shadow:0 1px 3px r
 </div>
 
 <!-- 🔻 Bottom Navigation Bar -->
-<div class="bottom-bar">
+<div class="bar">
   <a href="myStore.html" id="nav-store">
     <i class="fas fa-store"></i>
     <span>Store</span>
@@ -123,7 +96,7 @@ header h4 { color:#fff; font-size:21px; font-weight:600; text-shadow:0 1px 3px r
 
   <a href="sellerOrders.html" id="nav-orders">
     <i class="fas fa-box"></i>
-    <span>Orders</span>
+    <span>My Orders</span>
   </a>
 
   <a href="SellerProfile.html" id="nav-profile">
@@ -161,7 +134,7 @@ async function loadOrders(){
   try{
     const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/seller-orders/${seller.phone}`);
     let orders = await res.json();
-    if(!orders || orders.length===0){ container.innerHTML="<p style='text-align:center;'>No orders found.</p>"; return; }
+    if(!orders || orders.length===0){ container.innerHTML="<p style='text-align:center;'>📭 No orders yet</p>"; return; }
 
     // **Sort by most recent first**
     orders.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt));
