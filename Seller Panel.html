@@ -137,10 +137,10 @@ button:disabled{
   <input type="text" id="discount" placeholder="100">
 
   <label>Color:</label>
-  <input type="text" id="color" placeholder="Example: Red, Blue, Black">
+  <input type="text" id="colors" placeholder="Example: Red, Blue, Black">
 
   <label>Size:</label>
-  <input type="text" id="size" placeholder="Example: Small, Medium, Large">
+  <input type="text" id="sizes" placeholder="Example: Small, Medium, Large">
 
   <label>Description:</label>
   <textarea id="description" rows="6" placeholder="Product description here..."></textarea>
@@ -176,7 +176,7 @@ if (!sellerPhone) {
 }
 
 // ✅ Auto Save Inputs
-const fields = ["title", "price", "discount", "color", "size", "description"];
+const fields = ["title", "price", "discount", "colors", "sizes", "description"];
 fields.forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener("input", () => {

@@ -58,10 +58,10 @@
   <input type="text" id="discount" placeholder="100">
 
   <label>Color:</label>
-  <input type="text" id="color" placeholder="Red, Blue, Black">
+  <input type="text" id="colors" placeholder="Red, Blue, Black">
 
   <label>Size:</label>
-  <input type="text" id="size" placeholder="Small, Medium, Large">
+  <input type="text" id="sizes" placeholder="Small, Medium, Large">
 
   <label>Description:</label>
   <textarea id="description" rows="6" placeholder="Product description here..."></textarea>
@@ -96,8 +96,8 @@ const editItem = JSON.parse(localStorage.getItem("editItem") || "{}");
 document.getElementById("title").value = editItem.title || "";
 document.getElementById("price").value = editItem.price || "";
 document.getElementById("discount").value = editItem.discount || "";
-document.getElementById("color").value = editItem.colors || "";
-document.getElementById("size").value = editItem.sizes || "";
+document.getElementById("colors").value = editItem.colors || "";
+document.getElementById("sizes").value = editItem.sizes || "";
 document.getElementById("description").value = editItem.description || "";
 document.getElementById("selectedCategoryInput").value = editItem.category || "";
 
@@ -175,8 +175,8 @@ document.getElementById("productForm").addEventListener("submit", async function
   const title = document.getElementById("title").value.trim();
   const price = document.getElementById("price").value.trim();
   const discount = document.getElementById("discount").value.trim();
-  const color = document.getElementById("color").value.trim();
-  const size = document.getElementById("size").value.trim();
+  const colors = document.getElementById("color").value.trim();
+  const sizes = document.getElementById("size").value.trim();
   const description = document.getElementById("description").value.trim();
   if(!title || !price){ alert("⚠️ Title and price are required!"); return; }
 
@@ -186,8 +186,8 @@ document.getElementById("productForm").addEventListener("submit", async function
   formData.append("title", title);
   formData.append("price", price);
   formData.append("discount", discount);
-  formData.append("colors", color);
-  formData.append("sizes", size);
+  formData.append("colors", colors);
+  formData.append("sizes", sizes);
   formData.append("description", description);
 
   document.querySelectorAll(".imgInput").forEach(input=>{
