@@ -4,216 +4,258 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Edit Product - Delight.pk</title>
+
 <style>
-  body {
-    font-family:'Segoe UI',sans-serif;
-    background:#f9f9f9;
-    padding:20px;
-    max-width:600px;
-    margin:auto;
-  }
-  h3 {
-    color:#ef6c00;
-    border-bottom:2px solid #ef6c00;
-    padding-bottom:5px;
-  }
-  label {
-    font-weight:bold;
-    display:block;
-    margin-top:15px;
-  }
-  input[type="text"], textarea {
-    width:100%;
-    padding:8px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    margin-top:5px;
-  }
-  input[readonly] { background:#fff8e6; cursor:pointer; }
-  .fileUpload {
-    position:relative; display:inline-block; overflow:hidden;
-    background:#ef6c00; color:white; border-radius:8px;
-    padding:8px 14px; cursor:pointer; font-size:14px; margin-top:10px; margin-right:10px;
-  }
-  .fileUpload input[type="file"] { position:absolute; left:0; top:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-  button { background:#ef6c00; color:white; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; margin-top:20px; margin-right:10px; font-weight:bold; }
-  .preview-container img, .preview-container video { width:80px; height:80px; object-fit:cover; margin:5px; border-radius:8px; border:1px solid #ddd; }
-  .preview-container { display:flex; flex-wrap:wrap; margin-top:10px; }
-  .success { background:#e8f5e9; border:1px solid #4caf50; color:#2e7d32; padding:10px; border-radius:8px; display:none; margin-top:15px; }
+body{
+  font-family:'Segoe UI',sans-serif;
+  background:#f9f9f9;
+  padding:20px;
+  max-width:600px;
+  margin:auto;
+}
+h3{
+  color:#ef6c00;
+  border-bottom:2px solid #ef6c00;
+  padding-bottom:5px;
+}
+label{
+  font-weight:bold;
+  display:block;
+  margin-top:15px;
+}
+input[type="text"], textarea{
+  width:100%;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin-top:5px;
+}
+input[readonly]{
+  background:#fff8e6;
+  cursor:pointer;
+}
+.fileUpload{
+  position:relative;
+  display:inline-block;
+  overflow:hidden;
+  background:#ef6c00;
+  color:white;
+  border-radius:8px;
+  padding:8px 14px;
+  cursor:pointer;
+  font-size:14px;
+  margin-top:10px;
+  margin-right:10px;
+}
+.fileUpload input{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  cursor:pointer;
+}
+button{
+  background:#ef6c00;
+  color:white;
+  border:none;
+  padding:10px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:20px;
+  font-weight:bold;
+}
+.preview-container{
+  display:flex;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.preview-container img,
+.preview-container video{
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  margin:5px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+.success{
+  background:#e8f5e9;
+  border:1px solid #4caf50;
+  color:#2e7d32;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+  margin-top:15px;
+}
 </style>
 </head>
+
 <body>
 
 <h3>Edit Product</h3>
 
 <form id="productForm">
 
-  <label>Title:</label>
-  <input type="text" id="title" placeholder="Product Title">
+<label>Title</label>
+<input type="text" id="title">
 
-  <label>Price:</label>
-  <input type="text" id="price" placeholder="999">
+<label>Price</label>
+<input type="text" id="price">
 
-  <label>Discount (Rs.):</label>
-  <input type="text" id="discount" placeholder="100">
+<label>Discount (Rs.)</label>
+<input type="text" id="discount">
 
-  <label>Color:</label>
-  <input type="text" id="colors" placeholder="Red, Blue, Black">
+<label>Colors</label>
+<input type="text" id="colors">
 
-  <label>Size:</label>
-  <input type="text" id="sizes" placeholder="Small, Medium, Large">
+<label>Sizes</label>
+<input type="text" id="sizes">
 
-  <label>Description:</label>
-  <textarea id="description" rows="6" placeholder="Product description here..."></textarea>
+<label>Description</label>
+<textarea id="description" rows="5"></textarea>
 
-  <label>Category:</label>
-  <input type="text" id="selectedCategoryInput" placeholder="Choose Category" readonly>
+<label>Category</label>
+<input type="text" id="selectedCategoryInput" readonly placeholder="Choose Category">
 
-  <label>Product Images (12 max):</label>
-  <div id="imageInputs"></div>
-  <div class="preview-container" id="imagePreview"></div>
+<label>Product Images (12 max)</label>
+<div id="imageInputs"></div>
+<div class="preview-container" id="imagePreview"></div>
 
-  <label>Product Videos (3 max):</label>
-  <div id="videoInputs"></div>
-  <div class="preview-container" id="videoPreview"></div>
+<label>Product Videos (3 max)</label>
+<div id="videoInputs"></div>
+<div class="preview-container" id="videoPreview"></div>
 
-  <button type="submit">Update Product</button>
+<button type="submit">Update Product</button>
 </form>
 
 <div id="successBox" class="success">✅ Product updated successfully!</div>
 
 <script>
-// 🔹 Seller login check
-const sellerData = JSON.parse(localStorage.getItem("seller"));
-const sellerPhone = sellerData ? sellerData.phone : null;
-if (!sellerPhone) {
-  alert("⚠️ Please login first!");
-  window.location.href = "login.html";
+// 🔐 Seller check
+const seller = JSON.parse(localStorage.getItem("seller"));
+if(!seller){
+  alert("Please login first");
+  location.href="login.html";
 }
+const sellerPhone = seller.phone;
 
-// 🔹 Load editItem
+// 📦 Load product to edit
 const editItem = JSON.parse(localStorage.getItem("editItem") || "{}");
-document.getElementById("title").value = editItem.title || "";
-document.getElementById("price").value = editItem.price || "";
-document.getElementById("discount").value = editItem.discount || "";
-document.getElementById("colors").value = editItem.colors || "";
-document.getElementById("sizes").value = editItem.sizes || "";
-document.getElementById("description").value = editItem.description || "";
-document.getElementById("selectedCategoryInput").value = editItem.category || "";
+if(!editItem.id){
+  alert("No product selected");
+  location.href="seller-products.html";
+}
 
-// Category select
-const categoryInput = document.getElementById("selectedCategoryInput");
-categoryInput.addEventListener("click", () => {
-  window.open("SelectCategory.html", "_blank", "width=400,height=600");
+// Fill data
+title.value = editItem.title || "";
+price.value = editItem.price || "";
+discount.value = editItem.discount || "";
+colors.value = editItem.colors || "";
+sizes.value = editItem.sizes || "";
+description.value = editItem.description || "";
+selectedCategoryInput.value = editItem.category || "";
+
+// Category picker
+selectedCategoryInput.onclick = () => {
+  window.open("SelectCategory.html","_blank","width=400,height=600");
+};
+
+// Sync category after popup
+window.addEventListener("focus",()=>{
+  const cat = localStorage.getItem("selectedCategory");
+  if(cat) selectedCategoryInput.value = cat;
 });
 
-// ================= IMAGE SECTION =================
-const imagePreviewBox = document.getElementById("imagePreview");
-const imageInputsDiv = document.getElementById("imageInputs");
-for (let i = 0; i < 12; i++) {
-  const label = document.createElement("label");
-  label.className = "fileUpload";
-  label.innerHTML = `Upload Image ${i+1}<input type="file" accept="image/*" class="imgInput">`;
-  imageInputsDiv.appendChild(label);
+// 🖼️ Images
+for(let i=0;i<12;i++){
+  const lbl=document.createElement("label");
+  lbl.className="fileUpload";
+  lbl.innerHTML=`Upload Image ${i+1}<input type="file" class="imgInput" accept="image/*">`;
+  imageInputs.appendChild(lbl);
 }
-// Preload existing images
-if(editItem.images && editItem.images.length){
-  editItem.images.forEach(imgUrl => {
-    const imgEl = document.createElement("img");
-    imgEl.src = imgUrl;
-    imagePreviewBox.appendChild(imgEl);
-  });
-}
-document.addEventListener("change", function(e){
+(editItem.images||[]).forEach(src=>{
+  const img=document.createElement("img");
+  img.src=src;
+  imagePreview.appendChild(img);
+});
+document.addEventListener("change",e=>{
   if(e.target.classList.contains("imgInput")){
-    const img = e.target.files[0];
-    if(img){
-      const imgEl = document.createElement("img");
-      imgEl.src = URL.createObjectURL(img);
-      imagePreviewBox.appendChild(imgEl);
+    const f=e.target.files[0];
+    if(f){
+      const img=document.createElement("img");
+      img.src=URL.createObjectURL(f);
+      imagePreview.appendChild(img);
     }
   }
 });
 
-// ================= VIDEO SECTION =================
-const videoPreviewBox = document.getElementById("videoPreview");
-const videoInputsDiv = document.getElementById("videoInputs");
-for (let i = 0; i < 3; i++) {
-  const label = document.createElement("label");
-  label.className = "fileUpload";
-  label.innerHTML = `Upload Video ${i+1}<input type="file" accept="video/*" class="videoInput">`;
-  videoInputsDiv.appendChild(label);
+// 🎥 Videos
+for(let i=0;i<3;i++){
+  const lbl=document.createElement("label");
+  lbl.className="fileUpload";
+  lbl.innerHTML=`Upload Video ${i+1}<input type="file" class="videoInput" accept="video/*">`;
+  videoInputs.appendChild(lbl);
 }
-// Preload existing videos
-if(editItem.videos && editItem.videos.length){
-  editItem.videos.forEach(videoUrl => {
-    const videoEl = document.createElement("video");
-    videoEl.src = videoUrl;
-    videoEl.controls = true;
-    videoPreviewBox.appendChild(videoEl);
-  });
-}
-document.addEventListener("change", function(e){
+(editItem.videos||[]).forEach(src=>{
+  const v=document.createElement("video");
+  v.src=src;
+  v.controls=true;
+  videoPreview.appendChild(v);
+});
+document.addEventListener("change",e=>{
   if(e.target.classList.contains("videoInput")){
-    const video = e.target.files[0];
-    if(video){
-      const videoEl = document.createElement("video");
-      videoEl.src = URL.createObjectURL(video);
-      videoEl.controls = true;
-      videoPreviewBox.appendChild(videoEl);
+    const f=e.target.files[0];
+    if(f){
+      const v=document.createElement("video");
+      v.src=URL.createObjectURL(f);
+      v.controls=true;
+      videoPreview.appendChild(v);
     }
   }
 });
 
-// ================= FORM SUBMIT =================
-document.getElementById("productForm").addEventListener("submit", async function(e){
+// 🚀 Update submit
+productForm.onsubmit = async e =>{
   e.preventDefault();
 
-  const selectedCategory = categoryInput.value.trim();
-  if(!selectedCategory){ alert("⚠️ Please select a category!"); return; }
+  if(!title.value || !price.value){
+    alert("Title & price required");
+    return;
+  }
 
-  const title = document.getElementById("title").value.trim();
-  const price = document.getElementById("price").value.trim();
-  const discount = document.getElementById("discount").value.trim();
-  const colors = document.getElementById("color").value.trim();
-  const sizes = document.getElementById("size").value.trim();
-  const description = document.getElementById("description").value.trim();
-  if(!title || !price){ alert("⚠️ Title and price are required!"); return; }
+  const fd = new FormData();
+  fd.append("sellerPhone",sellerPhone);
+  fd.append("category",selectedCategoryInput.value);
+  fd.append("title",title.value);
+  fd.append("price",price.value);
+  fd.append("discount",discount.value);
+  fd.append("colors",colors.value);
+  fd.append("sizes",sizes.value);
+  fd.append("description",description.value);
 
-  const formData = new FormData();
-  formData.append("sellerPhone", sellerPhone);
-  formData.append("category", selectedCategory);
-  formData.append("title", title);
-  formData.append("price", price);
-  formData.append("discount", discount);
-  formData.append("colors", colors);
-  formData.append("sizes", sizes);
-  formData.append("description", description);
-
-  document.querySelectorAll(".imgInput").forEach(input=>{
-    if(input.files[0]) formData.append("images", input.files[0]);
+  document.querySelectorAll(".imgInput").forEach(i=>{
+    if(i.files[0]) fd.append("images",i.files[0]);
   });
-  document.querySelectorAll(".videoInput").forEach(input=>{
-    if(input.files[0]) formData.append("videos", input.files[0]);
+  document.querySelectorAll(".videoInput").forEach(i=>{
+    if(i.files[0]) fd.append("videos",i.files[0]);
   });
 
   try{
-    const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/edit-product/${editItem.id}`, {
-      method:"PUT",
-      body:formData
-    });
+    const res = await fetch(
+      `https://delight-backend--araindaniyalo2.replit.app/edit-product/${editItem.id}`,
+      {method:"PUT",body:fd}
+    );
     const data = await res.json();
     if(data.success){
-      document.getElementById("successBox").style.display = "block";
+      successBox.style.display="block";
       localStorage.removeItem("editItem");
-    } else {
-      alert("❌ Update failed: "+(data.message||""));
+      localStorage.removeItem("selectedCategory");
+    }else{
+      alert(data.message||"Update failed");
     }
-  }catch(err){
-    console.error(err);
-    alert("⚠️ Error connecting to backend.");
+  }catch{
+    alert("Server error");
   }
-});
+};
 </script>
 
 </body>
