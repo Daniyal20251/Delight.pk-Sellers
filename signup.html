@@ -52,7 +52,9 @@
       const payload = { name, phone, password: pass };
 
       try {
-        const baseUrl = "https://delight-backend--araindaniyalo2.replit.app"; // backend base URL
+        const baseUrl = "https://delight-backend--araindaniyalo2.replit.app";
+        
+        // Step 1: Signup user
         const res = await fetch(baseUrl + "/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -60,14 +62,42 @@
         });
 
         const data = await res.json();
+        console.log("Signup response:", data);
+
         if (res.ok && data.success) {
-          // Save seller info locally
-          const sellerData = { name, phone };
+          // Save user data
+          const sellerData = { 
+            id: data.user.id,
+            name: data.user.name,
+            phone: data.user.phone
+          };
+          
           localStorage.setItem("seller", JSON.stringify(sellerData));
-          localStorage.setItem("sellerPhone", phone); // for orders page
+          
+          console.log("Saved to localStorage:", sellerData);
+
+          // ✅ Step 2: Also create seller in database
+          try {
+            console.log("Creating seller in database...");
+            
+            const sellerSignupRes = await fetch(baseUrl + "/seller-signup", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: name,
+                phone: phone,
+                password: pass
+              })
+            });
+            
+            const sellerResult = await sellerSignupRes.json();
+            console.log("Seller created:", sellerResult);
+          } catch(e) {
+            console.log("Seller create error (might already exist):", e);
+          }
 
           alert("✅ Signup successful!");
-          window.location.href = "SP.Name.html"; // redirect to seller profile setup
+          window.location.href = "SP.Name.html";
         } else {
           alert(data.message || "Signup failed. Try again.");
         }

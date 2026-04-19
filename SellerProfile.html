@@ -23,6 +23,39 @@ button:hover{background:#d55c00;}
 .bar{position:fixed;bottom:0;left:0;width:100%;background:#ef6c00;display:flex;justify-content:space-around;align-items:center;padding:14px 0;z-index:9999;box-shadow:0 -2px 6px rgba(0,0,0,0.2);}
 .bar a{text-decoration:none;color:white;text-align:center;font-size:15px;font-weight:bold;}
 .bar i{display:block;font-size:20px;margin-bottom:3px;}
+
+/* 🔥 Store Link Styles */
+.store-link-box{
+  background:#f0f8ff;
+  border:2px dashed #ef6c00;
+  border-radius:10px;
+  padding:15px;
+  margin:15px 0;
+  text-align:center;
+}
+.store-link-box p{
+  font-size:14px;
+  color:#333;
+  margin-bottom:8px;
+  font-weight:600;
+}
+.store-link-box a{
+  color:#ef6c00;
+  text-decoration:none;
+  font-size:13px;
+  word-break:break-all;
+  display:block;
+  margin-bottom:10px;
+}
+.store-link-box button{
+  background:#28a745;
+  margin-top:5px;
+  font-size:14px;
+  padding:8px 0;
+}
+.store-link-box button:hover{
+  background:#218838;
+}
 </style>
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
@@ -47,6 +80,14 @@ button:hover{background:#d55c00;}
   <input type="number" id="deliveryInput" placeholder="200">
 
   <button onclick="updateProfile()">Save & Continue</button>
+  
+  <!-- 🔥 YOUR STORE LINK - Save ke neeche, Upload ke upar -->
+  <div class="store-link-box" id="storeLinkBox" style="display:none;">
+    <p>🔗 Your Store Link</p>
+    <a id="storeLink" href="#" target="_blank"></a>
+    <button onclick="copyStoreLink()">📋 Copy Link</button>
+  </div>
+  
   <button id="uploadBtn" onclick="goToSellerPanel()">Upload Product</button>
   <button onclick="openRentPage()">Manage Rentals</button>
 
@@ -67,6 +108,8 @@ const storeInput = document.getElementById("storeName");
 const fileInput = document.getElementById("file-upload");
 const profileContainer = document.getElementById("profilePicContainer");
 const deliveryInput = document.getElementById("deliveryInput");
+const storeLinkBox = document.getElementById("storeLinkBox");
+const storeLink = document.getElementById("storeLink");
 
 profileContainer.addEventListener("click", ()=> fileInput.click());
 
@@ -74,6 +117,32 @@ profileContainer.addEventListener("click", ()=> fileInput.click());
 const seller = JSON.parse(localStorage.getItem("seller"));
 if(!seller){
   window.location.href="signup.html";
+}
+
+// 🔥 Generate Store Link
+function generateStoreLink(){
+  const phone = seller.phone;
+  const link = `https://daniyal20251.github.io/Delight.pk/Store.html?phone=${phone}`;
+  storeLink.href = link;
+  storeLink.innerText = link;
+  storeLinkBox.style.display = "block";
+}
+
+// 🔥 Copy Store Link
+function copyStoreLink(){
+  const link = storeLink.href;
+  navigator.clipboard.writeText(link).then(() => {
+    alert("✅ Store link copied!");
+  }).catch(() => {
+    // Fallback for older browsers
+    const input = document.createElement("input");
+    input.value = link;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand("copy");
+    document.body.removeChild(input);
+    alert("✅ Store link copied!");
+  });
 }
 
 // ✅ Load existing settings
@@ -85,6 +154,10 @@ async function loadSettings(){
     if(data.name){ storeInput.value=data.name; document.getElementById("welcomeText").innerText="Hello, "+data.name+" 👋"; }
     else { document.getElementById("welcomeText").innerText="Hello, "+(seller.name || "Seller")+" 👋"; }
     if(data.delivery){ deliveryInput.value = data.delivery; }
+    
+    // 🔥 Generate store link on load
+    generateStoreLink();
+    
   }catch(err){ console.error(err); }
 }
 window.onload = loadSettings;

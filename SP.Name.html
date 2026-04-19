@@ -86,10 +86,50 @@ button{
   cursor:pointer;
   font-size:16px;
   transition:0.3s;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:45px;
 }
 
 button:hover{
   background:#d85c00;
+}
+
+button:disabled{
+  background:#ccc;
+  cursor:not-allowed;
+}
+
+/* Loading Spinner Styles */
+.button--loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-top: -10px;
+  margin-left: -10px;
+  border: 3px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: button-loading-spinner 1s linear infinite;
+}
+
+.button--loading .button__text {
+  visibility: hidden;
+  opacity: 0;
+}
+
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .file-input{
@@ -120,7 +160,9 @@ button:hover{
 
   <input type="text" id="storeName" placeholder="Enter your Store Name">
 
-  <button onclick="createStore()">Save & Continue</button>
+  <button id="saveBtn" onclick="createStore()">
+    <span class="button__text">Save & Continue</span>
+  </button>
 </div>
 
 <script>
@@ -128,23 +170,29 @@ const fileInput   = document.getElementById("file-upload");
 const profileImg  = document.getElementById("profile-img");
 const plusSign    = document.querySelector(".plus-sign");
 const storeInput  = document.getElementById("storeName");
+const saveBtn     = document.getElementById("saveBtn");
 
 let selectedFile = null;
 
-// ✅ Seller login check
-const seller = JSON.parse(localStorage.getItem("seller"));
-if(!seller){
+// ✅ Seller login check - IMPROVED
+let seller = JSON.parse(localStorage.getItem("seller"));
+console.log("SP.Name - Seller from localStorage:", seller);
+
+if(!seller || !seller.phone){
   alert("⚠️ Please login first!");
   window.location.href = "login.html";
 }
 
-// ✅ Load existing data (edit mode)
+// ✅ Load existing data (edit mode) - INPUT HAMESHA EMPTY
 async function loadSettings(){
   try{
+    console.log("Loading settings for phone:", seller.phone);
+    
     const res = await fetch(
       `https://delight-backend--araindaniyalo2.replit.app/settings?phone=${seller.phone}`
     );
     const data = await res.json();
+    console.log("Settings loaded:", data);
 
     if(data.logo){
       profileImg.src = data.logo;
@@ -152,9 +200,9 @@ async function loadSettings(){
       plusSign.style.display = "none";
     }
 
-    if(data.name){
-      storeInput.value = data.name;
-    }
+    // ❌ INPUT KO BILKUL EMPTY RAKHNA - KOIBHI AUTO-FILL NAHI
+    storeInput.value = "";
+    
   }catch(err){
     console.log("Load error:", err);
   }
@@ -176,7 +224,7 @@ fileInput.addEventListener("change", e=>{
   }
 });
 
-// ✅ Save Store (LOGO REQUIRED)
+// ✅ Save Store (LOGO REQUIRED) - WITH LOADING ANIMATION & REDIRECT FIX
 async function createStore(){
   const storeName = storeInput.value.trim();
 
@@ -191,7 +239,13 @@ async function createStore(){
     return;
   }
 
+  // 🔥 Loading animation start
+  saveBtn.classList.add("button--loading");
+  saveBtn.disabled = true;
+
   const formData = new FormData();
+  
+  // ✅ IMPORTANT: Use seller.phone
   formData.append("phone", seller.phone);
   formData.append("name", storeName);
 
@@ -200,23 +254,37 @@ async function createStore(){
   }
 
   try{
+    console.log("Sending update with phone:", seller.phone);
+    
     const res = await fetch(
       "https://delight-backend--araindaniyalo2.replit.app/update-settings",
       { method:"POST", body:formData }
     );
 
     const data = await res.json();
+    console.log("Update response:", data);
 
     if(data.success){
       alert("✅ Store saved successfully!");
-      window.location.href = "SellerProfile.html";
+      
+      // 🔥 Redirect fix
+      setTimeout(() => {
+        window.location.href = "SellerProfile.html";
+      }, 500);
+      
     }else{
       alert("⚠️ " + (data.message || "Something went wrong"));
+      // Loading hatana agar error aaye
+      saveBtn.classList.remove("button--loading");
+      saveBtn.disabled = false;
     }
 
   }catch(err){
     alert("⚠️ Server not reachable!");
     console.error(err);
+    // Loading hatana agar error aaye
+    saveBtn.classList.remove("button--loading");
+    saveBtn.disabled = false;
   }
 }
 </script>
