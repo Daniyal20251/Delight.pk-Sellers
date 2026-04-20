@@ -64,6 +64,7 @@
     border-radius:8px;
     cursor:pointer;
     margin-top:20px;
+    margin-bottom: 120px;
     margin-right:10px;
     font-weight:bold;
   }
@@ -119,6 +120,9 @@ button:disabled{
   opacity:0.6;
   cursor:not-allowed;
 }
+.bar{position:fixed;bottom:0;left:0;width:100%;background:#ef6c00;display:flex;justify-content:space-around;align-items:center;padding:14px 0;z-index:9999;box-shadow:0 -2px 6px rgba(0,0,0,0.2);}
+.bar a{text-decoration:none;color:white;text-align:center;font-size:15px;font-weight:bold;}
+.bar i{display:block;font-size:20px;margin-bottom:3px;}
 </style>
 </head>
 <body>
@@ -165,6 +169,25 @@ button:disabled{
 </div>
 
 <div id="successBox" class="success">✅ Product uploaded successfully!</div>
+
+<div class="bar">
+  <a href="myStore.html" onclick="goToMyStore()"><i class="fas fa-store"></i>Store</a>
+  <a href="sellerOrders.html" onclick="goToOrders()"><i class="fas fa-box"></i>My Orders</a>
+  <a href="SellerProfile.html"><i class="fas fa-user"></i>Profile</a>
+</div>
+<script>
+  // ✅ My Store from bar
+function goToMyStore(){
+  localStorage.setItem("sellerPhone", seller.phone);
+  window.location.href="myStore.html";
+}
+
+// ✅ Go to Orders Page
+function goToOrders(){ 
+  localStorage.setItem("sellerOrdersData", JSON.stringify({name: storeInput.value || seller.name, phone: seller.phone}));
+  window.location.href="sellerOrders.html";
+}
+</script>
 
 <script>
 // ✅ Seller login check
