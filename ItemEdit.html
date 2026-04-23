@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Edit Product - Delight.pk</title>
-
 <style>
 body{
   font-family:'Segoe UI',sans-serif;
@@ -29,6 +28,7 @@ input[type="text"], textarea{
   border:1px solid #ccc;
   border-radius:8px;
   margin-top:5px;
+  box-sizing:border-box;
 }
 input[readonly]{
   background:#fff8e6;
@@ -61,6 +61,7 @@ button{
   border-radius:8px;
   cursor:pointer;
   margin-top:20px;
+  margin-bottom:120px;
   font-weight:bold;
 }
 .preview-container{
@@ -85,6 +86,158 @@ button{
   border-radius:8px;
   display:none;
   margin-top:15px;
+}
+
+/* ===== CATEGORY DROPDOWN STYLES ===== */
+.cat-dropdown {
+  position:relative;
+  width:100%;
+}
+.cat-display {
+  width:100%;
+  padding:10px;
+  border:1px solid #ccc;
+  border-radius:8px;
+  background:#fff8e6;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+}
+.cat-display:hover {
+  border-color:#ef6c00;
+}
+.cat-panel {
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:8px;
+  margin-top:4px;
+  z-index:100;
+  max-height:350px;
+  overflow-y:auto;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+.cat-panel.open {
+  display:block;
+}
+.cat-main {
+  padding:10px 12px;
+  font-weight:bold;
+  font-size:14px;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #f0f0f0;
+  transition:0.15s;
+}
+.cat-main:hover {
+  background:#fff7e6;
+}
+.cat-main.selected {
+  background:#ef6c00;
+  color:white;
+}
+.cat-main .arrow {
+  transition: transform 0.2s;
+  font-size:12px;
+}
+.cat-main.selected .arrow {
+  color:white;
+}
+.cat-main .arrow.open {
+  transform: rotate(180deg);
+}
+.sub-list {
+  display:none;
+  padding:4px 12px 8px 24px;
+  background:#fffbf0;
+}
+.sub-list.open {
+  display:block;
+}
+.sub-item {
+  padding:6px 10px;
+  font-size:13px;
+  cursor:pointer;
+  border-radius:4px;
+  margin:2px 0;
+  transition:0.15s;
+}
+.sub-item:hover {
+  background:#ffe0b3;
+}
+.sub-item.selected {
+  background:#ef6c00;
+  color:white;
+  font-weight:bold;
+}
+.overlay-backdrop {
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:99;
+}
+.overlay-backdrop.open {
+  display:block;
+}
+
+/* LOADING */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.spinner{
+  width:30px;
+  height:30px;
+  border:6px solid #ffe0b2;
+  border-top:6px solid #ef6c00;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
+.bar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#ef6c00;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  padding:14px 0;
+  z-index:9999;
+  box-shadow:0 -2px 6px rgba(0,0,0,0.2);
+}
+.bar a{
+  text-decoration:none;
+  color:white;
+  text-align:center;
+  font-size:15px;
+  font-weight:bold;
+}
+.bar i{
+  display:block;
+  font-size:20px;
+  margin-bottom:3px;
 }
 </style>
 </head>
@@ -114,9 +267,153 @@ button{
 <textarea id="description" rows="5"></textarea>
 
 <label>Category</label>
-<input type="text" id="selectedCategoryInput" readonly placeholder="Choose Category">
+<div class="cat-dropdown">
+  <div class="cat-display" id="catDisplay">
+    <span id="catDisplayText">Choose Category</span>
+    <span id="catDisplayArrow">▼</span>
+  </div>
+  <div class="cat-panel" id="catPanel">
+    <!-- 1. Men Fashion -->
+    <div class="cat-main" data-cat="Men Fashion">Men Fashion 👕 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Men Fashion - T-Shirts">T-Shirts</div>
+      <div class="sub-item" data-value="Men Fashion - Jeans">Jeans</div>
+      <div class="sub-item" data-value="Men Fashion - Shoes">Shoes</div>
+      <div class="sub-item" data-value="Men Fashion - Watches">Watches</div>
+      <div class="sub-item" data-value="Men Fashion - Caps">Caps</div>
+    </div>
+    <!-- 2. Women Fashion -->
+    <div class="cat-main" data-cat="Women Fashion">Women Fashion 👗 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Women Fashion - Dresses">Dresses</div>
+      <div class="sub-item" data-value="Women Fashion - Handbags">Handbags</div>
+      <div class="sub-item" data-value="Women Fashion - Jewelry Sets">Jewelry Sets</div>
+      <div class="sub-item" data-value="Women Fashion - Sandals">Sandals</div>
+      <div class="sub-item" data-value="Women Fashion - Makeup Kits">Makeup Kits</div>
+    </div>
+    <!-- 3. Mobiles -->
+    <div class="cat-main" data-cat="Mobiles">Mobiles 📱 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Mobiles - Smartphones">Smartphones</div>
+      <div class="sub-item" data-value="Mobiles - Keypad Phones">Keypad Phones</div>
+      <div class="sub-item" data-value="Mobiles - Mobile Covers">Mobile Covers</div>
+      <div class="sub-item" data-value="Mobiles - Chargers">Chargers</div>
+      <div class="sub-item" data-value="Mobiles - Earbuds">Earbuds</div>
+    </div>
+    <!-- 4. Mobile Accessories -->
+    <div class="cat-main" data-cat="Mobile Accessories">Mobile Accessories 🔌 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Mobile Accessories - Power Banks">Power Banks</div>
+      <div class="sub-item" data-value="Mobile Accessories - Smart Watches">Smart Watches</div>
+      <div class="sub-item" data-value="Mobile Accessories - Data Cables">Data Cables</div>
+      <div class="sub-item" data-value="Mobile Accessories - Earphones">Earphones</div>
+      <div class="sub-item" data-value="Mobile Accessories - Stands & Holders">Stands & Holders</div>
+    </div>
+    <!-- 5. Electronics -->
+    <div class="cat-main" data-cat="Electronics">Electronics ⚡ <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Electronics - LED TV">LED TV</div>
+      <div class="sub-item" data-value="Electronics - Bluetooth Speakers">Bluetooth Speakers</div>
+      <div class="sub-item" data-value="Electronics - Headphones">Headphones</div>
+      <div class="sub-item" data-value="Electronics - Cameras">Cameras</div>
+      <div class="sub-item" data-value="Electronics - Smart Gadgets">Smart Gadgets</div>
+    </div>
+    <!-- 6. Beauty Products -->
+    <div class="cat-main" data-cat="Beauty Products">Beauty Products 💄 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Beauty Products - Perfumes">Perfumes</div>
+      <div class="sub-item" data-value="Beauty Products - Lipsticks">Lipsticks</div>
+      <div class="sub-item" data-value="Beauty Products - Face Creams">Face Creams</div>
+      <div class="sub-item" data-value="Beauty Products - Hair Oils">Hair Oils</div>
+      <div class="sub-item" data-value="Beauty Products - Makeup Brushes">Makeup Brushes</div>
+    </div>
+    <!-- 7. Home & Living -->
+    <div class="cat-main" data-cat="Home & Living">Home & Living 🏠 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Home & Living - Home Gadgets">Home Gadgets</div>
+      <div class="sub-item" data-value="Home & Living - Cleaning Tools">Cleaning Tools</div>
+      <div class="sub-item" data-value="Home & Living - Kitchen Accessories">Kitchen Accessories</div>
+      <div class="sub-item" data-value="Home & Living - Room Decor">Room Decor</div>
+      <div class="sub-item" data-value="Home & Living - Small Appliances">Small Appliances</div>
+    </div>
+    <!-- 8. Watches -->
+    <div class="cat-main" data-cat="Watches">Watches ⌚ <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Watches - Smart Watches">Smart Watches</div>
+      <div class="sub-item" data-value="Watches - Digital Watches">Digital Watches</div>
+      <div class="sub-item" data-value="Watches - Analog Watches">Analog Watches</div>
+      <div class="sub-item" data-value="Watches - Couple Watches">Couple Watches</div>
+      <div class="sub-item" data-value="Watches - Fitness Bands">Fitness Bands</div>
+    </div>
+    <!-- 9. Shoes -->
+    <div class="cat-main" data-cat="Shoes">Shoes 👟 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Shoes - Sneakers">Sneakers</div>
+      <div class="sub-item" data-value="Shoes - Sandals">Sandals</div>
+      <div class="sub-item" data-value="Shoes - Joggers">Joggers</div>
+      <div class="sub-item" data-value="Shoes - Slippers">Slippers</div>
+      <div class="sub-item" data-value="Shoes - Formal Shoes">Formal Shoes</div>
+    </div>
+    <!-- 10. Bags -->
+    <div class="cat-main" data-cat="Bags">Bags 👜 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Bags - School Bags">School Bags</div>
+      <div class="sub-item" data-value="Bags - Laptop Bags">Laptop Bags</div>
+      <div class="sub-item" data-value="Bags - Hand Bags">Hand Bags</div>
+      <div class="sub-item" data-value="Bags - Travel Bags">Travel Bags</div>
+      <div class="sub-item" data-value="Bags - Wallets">Wallets</div>
+    </div>
+    <!-- 11. Jewelry -->
+    <div class="cat-main" data-cat="Jewelry">Jewelry 💍 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Jewelry - Rings">Rings</div>
+      <div class="sub-item" data-value="Jewelry - Necklaces">Necklaces</div>
+      <div class="sub-item" data-value="Jewelry - Earrings">Earrings</div>
+      <div class="sub-item" data-value="Jewelry - Bracelets">Bracelets</div>
+      <div class="sub-item" data-value="Jewelry - Anklets">Anklets</div>
+    </div>
+    <!-- 12. Baby Products -->
+    <div class="cat-main" data-cat="Baby Products">Baby Products 🧸 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Baby Products - Baby Toys">Baby Toys</div>
+      <div class="sub-item" data-value="Baby Products - Baby Clothes">Baby Clothes</div>
+    </div>
+    <!-- 13. Sports Items -->
+    <div class="cat-main" data-cat="Sports Items">Sports Items 🏋️ <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Sports Items - Gym Gloves">Gym Gloves</div>
+      <div class="sub-item" data-value="Sports Items - Water Bottles">Water Bottles</div>
+      <div class="sub-item" data-value="Sports Items - Dumbbells">Dumbbells</div>
+      <div class="sub-item" data-value="Sports Items - Football">Football</div>
+      <div class="sub-item" data-value="Sports Items - Yoga Mats">Yoga Mats</div>
+    </div>
+    <!-- 14. Gaming -->
+    <div class="cat-main" data-cat="Gaming">Gaming 🎮 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Gaming - Gamepads">Gamepads</div>
+      <div class="sub-item" data-value="Gaming - Gaming Headsets">Gaming Headsets</div>
+      <div class="sub-item" data-value="Gaming - PS5 / Xbox Accessories">PS5 / Xbox Accessories</div>
+      <div class="sub-item" data-value="Gaming - Mouse Pads">Mouse Pads</div>
+      <div class="sub-item" data-value="Gaming - Gaming Keyboards">Gaming Keyboards</div>
+    </div>
+    <!-- 15. Computer Accessories -->
+    <div class="cat-main" data-cat="Computer Accessories">Computer Accessories 💻 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Computer Accessories - Keyboards">Keyboards</div>
+      <div class="sub-item" data-value="Computer Accessories - Mouse">Mouse</div>
+      <div class="sub-item" data-value="Computer Accessories - USB Drives">USB Drives</div>
+      <div class="sub-item" data-value="Computer Accessories - Headsets">Headsets</div>
+      <div class="sub-item" data-value="Computer Accessories - Laptop Stands">Laptop Stands</div>
+    </div>
+    <!-- 16. Other -->
+    <div class="cat-main" data-cat="Other">Other 🛒 <span class="arrow">▼</span></div>
+    <div class="sub-list">
+      <div class="sub-item" data-value="Other Things">Other Things</div>
+    </div>
+  </div>
+</div>
 
-<label>Product Images (12 max)</label>
+<label style="margin-top:20px;">Product Images (12 max)</label>
 <div id="imageInputs"></div>
 <div class="preview-container" id="imagePreview"></div>
 
@@ -124,10 +421,22 @@ button{
 <div id="videoInputs"></div>
 <div class="preview-container" id="videoPreview"></div>
 
-<button type="submit">Update Product</button>
+<button type="submit" id="updateBtn">Update Product</button>
 </form>
 
+<div class="overlay-backdrop" id="overlayBackdrop"></div>
+
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+</div>
+
 <div id="successBox" class="success">✅ Product updated successfully!</div>
+
+<div class="bar">
+  <a href="myStore.html"><i class="fas fa-store"></i>Store</a>
+  <a href="sellerOrders.html"><i class="fas fa-box"></i>My Orders</a>
+  <a href="SellerProfile.html"><i class="fas fa-user"></i>Profile</a>
+</div>
 
 <script>
 // 🔐 Seller check
@@ -152,18 +461,77 @@ discount.value = editItem.discount || "";
 colors.value = editItem.colors || "";
 sizes.value = editItem.sizes || "";
 description.value = editItem.description || "";
-selectedCategoryInput.value = editItem.category || "";
 
-// Category picker
-selectedCategoryInput.onclick = () => {
-  window.open("SelectCategory.html","_blank","width=400,height=600");
-};
+// ================= CATEGORY DROPDOWN LOGIC =================
+const catDisplay = document.getElementById('catDisplay');
+const catPanel = document.getElementById('catPanel');
+const catDisplayText = document.getElementById('catDisplayText');
+const catDisplayArrow = document.getElementById('catDisplayArrow');
+const overlayBackdrop = document.getElementById('overlayBackdrop');
 
-// Sync category after popup
-window.addEventListener("focus",()=>{
-  const cat = localStorage.getItem("selectedCategory");
-  if(cat) selectedCategoryInput.value = cat;
+function openCatPanel() {
+  catPanel.classList.add('open');
+  catDisplayArrow.textContent = '▲';
+  overlayBackdrop.classList.add('open');
+}
+function closeCatPanel() {
+  catPanel.classList.remove('open');
+  catDisplayArrow.textContent = '▼';
+  overlayBackdrop.classList.remove('open');
+}
+
+catDisplay.addEventListener('click', () => {
+  catPanel.classList.contains('open') ? closeCatPanel() : openCatPanel();
 });
+overlayBackdrop.addEventListener('click', closeCatPanel);
+
+// Main category click -> toggle sub-list only
+document.querySelectorAll('.cat-main').forEach(main => {
+  main.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const subList = main.nextElementSibling;
+    const arrow = main.querySelector('.arrow');
+    document.querySelectorAll('.sub-list').forEach(list => {
+      if (list !== subList) {
+        list.classList.remove('open');
+        const otherArrow = list.previousElementSibling.querySelector('.arrow');
+        if (otherArrow) otherArrow.classList.remove('open');
+      }
+    });
+    const isOpen = subList.classList.contains('open');
+    subList.classList.toggle('open', !isOpen);
+    arrow.classList.toggle('open', !isOpen);
+  });
+});
+
+// Sub-item click -> select and close
+document.querySelectorAll('.sub-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const selectedValue = item.dataset.value;
+    localStorage.setItem('selectedCategory', selectedValue);
+    catDisplayText.textContent = selectedValue;
+    document.querySelectorAll('.sub-item').forEach(d => d.classList.remove('selected'));
+    document.querySelectorAll('.cat-main').forEach(m => m.classList.remove('selected'));
+    item.classList.add('selected');
+    const parentCat = item.closest('.sub-list').previousElementSibling;
+    parentCat.classList.add('selected');
+    closeCatPanel();
+  });
+});
+
+// Restore saved category from editItem
+const savedCat = editItem.category || localStorage.getItem("selectedCategory");
+if (savedCat) {
+  catDisplayText.textContent = savedCat;
+  document.querySelectorAll('.sub-item').forEach(item => {
+    if (item.dataset.value === savedCat) {
+      item.classList.add('selected');
+      const parentCat = item.closest('.sub-list').previousElementSibling;
+      parentCat.classList.add('selected');
+    }
+  });
+}
 
 // 🖼️ Images
 for(let i=0;i<12;i++){
@@ -214,6 +582,9 @@ document.addEventListener("change",e=>{
 });
 
 // 🚀 Update submit
+const updateBtn = document.getElementById("updateBtn");
+const loading = document.getElementById("loading");
+
 productForm.onsubmit = async e =>{
   e.preventDefault();
 
@@ -222,9 +593,18 @@ productForm.onsubmit = async e =>{
     return;
   }
 
+  const selectedCategory = localStorage.getItem("selectedCategory") || editItem.category || "";
+  if(!selectedCategory){
+    alert("Please select a category!");
+    return;
+  }
+
+  updateBtn.disabled = true;
+  loading.style.display = "flex";
+
   const fd = new FormData();
   fd.append("sellerPhone",sellerPhone);
-  fd.append("category",selectedCategoryInput.value);
+  fd.append("category",selectedCategory);
   fd.append("title",title.value);
   fd.append("price",price.value);
   fd.append("discount",discount.value);
@@ -255,6 +635,9 @@ productForm.onsubmit = async e =>{
   }catch{
     alert("Server error");
   }
+
+  updateBtn.disabled = false;
+  loading.style.display = "none";
 };
 </script>
 
