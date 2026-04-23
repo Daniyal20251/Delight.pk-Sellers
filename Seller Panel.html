@@ -65,8 +65,8 @@
     border-radius:8px;
     cursor:pointer;
     margin-top:20px;
-    margin-bottom: 120px;
     margin-right:10px;
+    margin-bottom: 120px;
     font-weight:bold;
   }
   .preview-container img, .preview-container video {
@@ -91,57 +91,36 @@
     display:none;
     margin-top:15px;
   }
-  .loading-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(255,255,255,.9);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-  }
-  .spinner{
-    width:30px;
-    height:30px;
-    border:6px solid #ffe0b2;
-    border-top:6px solid #ef6c00;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
-  }
-  @keyframes spin{
-    0%{transform:rotate(0deg)}
-    100%{transform:rotate(360deg)}
-  }
-  button:disabled{
-    opacity:0.6;
-    cursor:not-allowed;
-  }
-  .bar{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    background:#ef6c00;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    padding:14px 0;
-    z-index:9999;
-    box-shadow:0 -2px 6px rgba(0,0,0,0.2);
-  }
-  .bar a{
-    text-decoration:none;
-    color:white;
-    text-align:center;
-    font-size:15px;
-    font-weight:bold;
-  }
-  .bar i{
-    display:block;
-    font-size:20px;
-    margin-bottom:3px;
-  }
+  /* 🔵 FULL PAGE LOADING */
+.loading-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
 
+/* 🔄 ROUND SPINNER */
+.spinner{
+  width:30px;
+  height:30px;
+  border:6px solid #ffe0b2;
+  border-top:6px solid #ef6c00;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+
+button:disabled{
+  opacity:0.6;
+  cursor:not-allowed;
+}
   /* ===== CATEGORY SELECTOR STYLES ===== */
   .cat-dropdown {
     position:relative;
@@ -414,7 +393,9 @@
     </div>
   </div>
 
-  <label style="margin-top:20px;">Select Product Images (12 max):</label>
+  <div class="overlay-backdrop" id="overlayBackdrop"></div>
+
+  <label>Select Product Images (12 max):</label>
   <div id="imageInputs"></div>
   <div class="preview-container" id="imagePreview"></div>
 
@@ -425,31 +406,12 @@
   <button type="submit">Upload Product</button>
 </form>
 
-<div class="overlay-backdrop" id="overlayBackdrop"></div>
-
-<!-- LOADING SCREEN -->
+<!-- 🔵 LOADING SCREEN -->
 <div class="loading-overlay" id="loading">
   <div class="spinner"></div>
 </div>
 
 <div id="successBox" class="success">✅ Product uploaded successfully!</div>
-
-<div class="bar">
-  <a href="myStore.html" onclick="goToMyStore()"><i class="fas fa-store"></i>Store</a>
-  <a href="sellerOrders.html" onclick="goToOrders()"><i class="fas fa-box"></i>My Orders</a>
-  <a href="SellerProfile.html"><i class="fas fa-user"></i>Profile</a>
-</div>
-
-<script>
-  function goToMyStore(){
-    localStorage.setItem("sellerPhone", seller.phone);
-    window.location.href="myStore.html";
-  }
-  function goToOrders(){ 
-    localStorage.setItem("sellerOrdersData", JSON.stringify({name: storeInput.value || seller.name, phone: seller.phone}));
-    window.location.href="sellerOrders.html";
-  }
-</script>
 
 <script>
 // ✅ Seller login check
@@ -464,11 +426,32 @@ if (!sellerPhone) {
 const fields = ["title", "price", "discount", "colors", "sizes", "description"];
 fields.forEach(id => {
   const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener("input", () => {
-      const saved = JSON.parse(localStorage.getItem("tempProductData") || "{}");
-      saved[id] = el.value;
-      localStorage.setItem("tempProductData", JSON.stringify(saved));
+  el.addEventListener("input", () => {
+    const saved = JSON.parse(localStorage.getItem("tempProductData") || "{}");
+    saved[id] = el.value;
+    localStorage.setItem("tempProductData", JSON.stringify(saved));
+  });
+});
+
+// ✅ Restore saved data
+window.addEventListener("DOMContentLoaded", () => {
+  const savedData = JSON.parse(localStorage.getItem("tempProductData") || "{}");
+  Object.keys(savedData).forEach(key => {
+    if (document.getElementById(key)) {
+      document.getElementById(key).value = savedData[key];
+    }
+  });
+
+  const savedCat = localStorage.getItem("selectedCategory");
+  if (savedCat) {
+    catDisplayText.textContent = savedCat;
+    // Highlight saved
+    document.querySelectorAll('.sub-item').forEach(item => {
+      if (item.dataset.value === savedCat) {
+        item.classList.add('selected');
+        const parentCat = item.closest('.sub-list').previousElementSibling;
+        parentCat.classList.add('selected');
+      }
     });
   }
 });
@@ -508,7 +491,7 @@ document.querySelectorAll('.cat-main').forEach(main => {
     e.stopPropagation();
     const subList = main.nextElementSibling;
     const arrow = main.querySelector('.arrow');
-    
+
     // Close all other sub-lists
     document.querySelectorAll('.sub-list').forEach(list => {
       if (list !== subList) {
@@ -517,7 +500,7 @@ document.querySelectorAll('.cat-main').forEach(main => {
         if (otherArrow) otherArrow.classList.remove('open');
       }
     });
-    
+
     // Toggle current
     const isOpen = subList.classList.contains('open');
     subList.classList.toggle('open', !isOpen);
@@ -530,46 +513,23 @@ document.querySelectorAll('.sub-item').forEach(item => {
   item.addEventListener('click', (e) => {
     e.stopPropagation();
     const selectedValue = item.dataset.value;
-    
+
     // Save
     localStorage.setItem('selectedCategory', selectedValue);
     catDisplayText.textContent = selectedValue;
-    
+
     // Highlight
     document.querySelectorAll('.sub-item').forEach(d => d.classList.remove('selected'));
     document.querySelectorAll('.cat-main').forEach(m => m.classList.remove('selected'));
     item.classList.add('selected');
-    
+
     // Highlight parent category too
     const parentCat = item.closest('.sub-list').previousElementSibling;
     parentCat.classList.add('selected');
-    
+
     // Close panel
     closeCatPanel();
   });
-});
-
-// ✅ Restore saved data
-window.addEventListener("DOMContentLoaded", () => {
-  const savedData = JSON.parse(localStorage.getItem("tempProductData") || "{}");
-  Object.keys(savedData).forEach(key => {
-    if (document.getElementById(key)) {
-      document.getElementById(key).value = savedData[key];
-    }
-  });
-
-  const savedCat = localStorage.getItem("selectedCategory");
-  if (savedCat) {
-    catDisplayText.textContent = savedCat;
-    // Highlight saved
-    document.querySelectorAll('.sub-item').forEach(item => {
-      if (item.dataset.value === savedCat) {
-        item.classList.add('selected');
-        const parentCat = item.closest('.sub-list').previousElementSibling;
-        parentCat.classList.add('selected');
-      }
-    });
-  }
 });
 
 // ================= IMAGE SECTION =================
@@ -580,7 +540,7 @@ for (let i = 0; i < 12; i++) {
   const label = document.createElement("label");
   label.className = "fileUpload";
   label.innerHTML = `Upload Image ${i + 1}`;
-  
+
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
@@ -598,11 +558,13 @@ document.addEventListener("change", function(e) {
 
     if (file) {
       let previewSlot = document.getElementById("imgPreview" + index);
+
       if (!previewSlot) {
         previewSlot = document.createElement("img");
         previewSlot.id = "imgPreview" + index;
         imagePreviewBox.appendChild(previewSlot);
       }
+
       previewSlot.src = URL.createObjectURL(file);
     }
   }
@@ -634,12 +596,14 @@ document.addEventListener("change", function(e) {
 
     if (file) {
       let previewSlot = document.getElementById("videoPreviewSlot" + index);
+
       if (!previewSlot) {
         previewSlot = document.createElement("video");
         previewSlot.id = "videoPreviewSlot" + index;
         previewSlot.controls = true;
         videoPreviewBox.appendChild(previewSlot);
       }
+
       previewSlot.src = URL.createObjectURL(file);
     }
   }
@@ -652,6 +616,7 @@ const loading = document.getElementById("loading");
 document.getElementById("productForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
+  // ❌ double click block
   if (uploadBtn.disabled) return;
 
   const selectedCategory = localStorage.getItem("selectedCategory");
@@ -668,6 +633,7 @@ document.getElementById("productForm").addEventListener("submit", async function
     return;
   }
 
+  // 🔒 LOCK UI
   uploadBtn.disabled = true;
   loading.style.display = "flex";
 
@@ -678,12 +644,14 @@ document.getElementById("productForm").addEventListener("submit", async function
     formData.append(id, document.getElementById(id).value.trim());
   });
 
-  document.querySelectorAll(".imgInput").forEach(input => {
-    if (input.files[0]) formData.append("images", input.files[0]);
+  // FIX: Send images with indexed field names
+  document.querySelectorAll(".imgInput").forEach((input, idx) => {
+    if (input.files[0]) formData.append("image" + idx, input.files[0]);
   });
 
-  document.querySelectorAll(".videoInput").forEach(input => {
-    if (input.files[0]) formData.append("videos", input.files[0]);
+  // FIX: Send videos with indexed field names
+  document.querySelectorAll(".videoInput").forEach((input, idx) => {
+    if (input.files[0]) formData.append("video" + idx, input.files[0]);
   });
 
   try {
@@ -699,6 +667,7 @@ document.getElementById("productForm").addEventListener("submit", async function
       document.getElementById("productForm").reset();
       imagePreviewBox.innerHTML = "";
       videoPreviewBox.innerHTML = "";
+
       catDisplayText.textContent = "Choose Category";
       document.querySelectorAll('.sub-item').forEach(d => d.classList.remove('selected'));
       document.querySelectorAll('.cat-main').forEach(m => m.classList.remove('selected'));
@@ -711,6 +680,7 @@ document.getElementById("productForm").addEventListener("submit", async function
     alert("⚠️ Error connecting to backend.");
   }
 
+  // 🔓 UNLOCK UI
   uploadBtn.disabled = false;
   loading.style.display = "none";
 });
