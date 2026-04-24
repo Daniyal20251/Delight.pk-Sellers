@@ -120,7 +120,7 @@ button:disabled{
   /* ===== CATEGORY SELECTOR STYLES ===== */
   .cat-dropdown {
     position:relative;
-    width:350;
+    width:345;
     margin-top: 6px;
   }
   .cat-display {
