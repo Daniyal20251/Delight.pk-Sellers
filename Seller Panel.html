@@ -3,224 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="SellerPanel.css">
 <title>Delight.pk Seller Panel</title>
-<style>
-  body {
-    font-family:'Segoe UI',sans-serif;
-    background:#f9f9f9;
-    padding:20px;
-    max-width:600px;
-    margin:auto;
-    margin-right: 12px;
-  }
-  h3 {
-    color:#ef6c00;
-    border-bottom:2px solid #ef6c00;
-    padding-bottom:5px;
-  }
-  label {
-    font-weight:bold;
-    display:block;
-    margin-top:15px;
-  }
-  input[type="text"], textarea {
-    width:100%;
-    padding:8px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    margin-top:5px;
-    box-sizing:border-box;
-  }
-  input[readonly] {
-    background:#fff8e6;
-    cursor:pointer;
-  }
-  .fileUpload {
-    position:relative;
-    display:inline-block;
-    overflow:hidden;
-    background:#ef6c00;
-    color:white;
-    border-radius:8px;
-    padding:8px 14px;
-    cursor:pointer;
-    font-size:14px;
-    margin-top:10px;
-    margin-right:10px;
-  }
-  .fileUpload input[type="file"] {
-    position:absolute;
-    left:0;
-    top:0;
-    opacity:0;
-    cursor:pointer;
-    width:100%;
-    height:100%;
-  }
-  button {
-    background:#ef6c00;
-    color:white;
-    border:none;
-    padding:10px 18px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-top:20px;
-    margin-right:10px;
-    margin-bottom: 120px;
-    font-weight:bold;
-  }
-  .preview-container img, .preview-container video {
-    width:80px;
-    height:80px;
-    object-fit:cover;
-    margin:5px;
-    border-radius:8px;
-    border:1px solid #ddd;
-  }
-  .preview-container {
-    display:flex;
-    flex-wrap:wrap;
-    margin-top:10px;
-  }
-  .success {
-    background:#e8f5e9;
-    border:1px solid #4caf50;
-    color:#2e7d32;
-    padding:10px;
-    border-radius:8px;
-    display:none;
-    margin-top:15px;
-  }
-  /* 🔵 FULL PAGE LOADING */
-.loading-overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(255,255,255,.9);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:9999;
-}
-
-/* 🔄 ROUND SPINNER */
-.spinner{
-  width:30px;
-  height:30px;
-  border:6px solid #ffe0b2;
-  border-top:6px solid #ef6c00;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-}
-
-@keyframes spin{
-  0%{transform:rotate(0deg)}
-  100%{transform:rotate(360deg)}
-}
-
-button:disabled{
-  opacity:0.6;
-  cursor:not-allowed;
-}
-  /* ===== CATEGORY SELECTOR STYLES ===== */
-  .cat-dropdown {
-    position:relative;
-    width:100%;
-  }
-  .cat-display {
-    width:100%;
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    background:#fff8e6;
-    cursor:pointer;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:14px;
-  }
-  .cat-display:hover {
-    border-color:#ef6c00;
-  }
-  .cat-panel {
-    display:none;
-    position:absolute;
-    top:100%;
-    left:0;
-    right:0;
-    background:#fff;
-    border:1px solid #ccc;
-    border-radius:8px;
-    margin-top:4px;
-    z-index:100;
-    max-height:350px;
-    overflow-y:auto;
-    box-shadow:0 4px 12px rgba(0,0,0,0.15);
-  }
-  .cat-panel.open {
-    display:block;
-  }
-  .cat-main {
-    padding:10px 12px;
-    font-weight:bold;
-    font-size:14px;
-    cursor:pointer;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #f0f0f0;
-    transition:0.15s;
-  }
-  .cat-main:hover {
-    background:#fff7e6;
-  }
-  .cat-main.selected {
-    background:#ef6c00;
-    color:white;
-  }
-  .cat-main .arrow {
-    transition: transform 0.2s;
-    font-size:12px;
-  }
-  .cat-main.selected .arrow {
-    color:white;
-  }
-  .cat-main .arrow.open {
-    transform: rotate(180deg);
-  }
-  .sub-list {
-    display:none;
-    padding:4px 12px 8px 24px;
-    background:#fffbf0;
-  }
-  .sub-list.open {
-    display:block;
-  }
-  .sub-item {
-    padding:6px 10px;
-    font-size:13px;
-    cursor:pointer;
-    border-radius:4px;
-    margin:2px 0;
-    transition:0.15s;
-  }
-  .sub-item:hover {
-    background:#ffe0b3;
-  }
-  .sub-item.selected {
-    background:#ef6c00;
-    color:white;
-    font-weight:bold;
-  }
-  .overlay-backdrop {
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:99;
-  }
-  .overlay-backdrop.open {
-    display:block;
-  }
-</style>
 </head>
 <body>
 
@@ -413,6 +197,12 @@ button:disabled{
 
 <div id="successBox" class="success">✅ Product uploaded successfully!</div>
 
+<div class="bar">
+  <a href="myStore.html"><i class="fas fa-store"></i>Store</a>
+  <a href="sellerOrders.html"><i class="fas fa-box"></i>My Orders</a>
+  <a href="SellerProfile.html"><i class="fas fa-user"></i>Profile</a>
+</div>
+
 <script>
 // ✅ Seller login check
 const sellerData = JSON.parse(localStorage.getItem("seller"));
@@ -445,7 +235,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const savedCat = localStorage.getItem("selectedCategory");
   if (savedCat) {
     catDisplayText.textContent = savedCat;
-    // Highlight saved
     document.querySelectorAll('.sub-item').forEach(item => {
       if (item.dataset.value === savedCat) {
         item.classList.add('selected');
@@ -476,23 +265,17 @@ function closeCatPanel() {
 }
 
 catDisplay.addEventListener('click', () => {
-  if (catPanel.classList.contains('open')) {
-    closeCatPanel();
-  } else {
-    openCatPanel();
-  }
+  catPanel.classList.contains('open') ? closeCatPanel() : openCatPanel();
 });
 
 overlayBackdrop.addEventListener('click', closeCatPanel);
 
-// Main category click -> toggle sub-list only
 document.querySelectorAll('.cat-main').forEach(main => {
   main.addEventListener('click', (e) => {
     e.stopPropagation();
     const subList = main.nextElementSibling;
     const arrow = main.querySelector('.arrow');
 
-    // Close all other sub-lists
     document.querySelectorAll('.sub-list').forEach(list => {
       if (list !== subList) {
         list.classList.remove('open');
@@ -501,110 +284,72 @@ document.querySelectorAll('.cat-main').forEach(main => {
       }
     });
 
-    // Toggle current
     const isOpen = subList.classList.contains('open');
     subList.classList.toggle('open', !isOpen);
     arrow.classList.toggle('open', !isOpen);
   });
 });
 
-// Sub-item click -> select and close
 document.querySelectorAll('.sub-item').forEach(item => {
   item.addEventListener('click', (e) => {
     e.stopPropagation();
     const selectedValue = item.dataset.value;
 
-    // Save
     localStorage.setItem('selectedCategory', selectedValue);
     catDisplayText.textContent = selectedValue;
 
-    // Highlight
     document.querySelectorAll('.sub-item').forEach(d => d.classList.remove('selected'));
     document.querySelectorAll('.cat-main').forEach(m => m.classList.remove('selected'));
     item.classList.add('selected');
 
-    // Highlight parent category too
     const parentCat = item.closest('.sub-list').previousElementSibling;
     parentCat.classList.add('selected');
 
-    // Close panel
     closeCatPanel();
   });
 });
 
-// ================= IMAGE SECTION =================
+// ================= IMAGE SECTION (itemedit.html style) =================
 const imagePreviewBox = document.getElementById("imagePreview");
 const imageInputsDiv = document.getElementById("imageInputs");
 
 for (let i = 0; i < 12; i++) {
   const label = document.createElement("label");
   label.className = "fileUpload";
-  label.innerHTML = `Upload Image ${i + 1}`;
-
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.className = "imgInput";
-  input.dataset.index = i;
-
-  label.appendChild(input);
+  label.innerHTML = `Upload Image ${i + 1}<input type="file" class="imgInput" accept="image/*">`;
   imageInputsDiv.appendChild(label);
 }
 
 document.addEventListener("change", function(e) {
   if (e.target.classList.contains("imgInput")) {
-    const index = e.target.dataset.index;
-    const file = e.target.files[0];
-
-    if (file) {
-      let previewSlot = document.getElementById("imgPreview" + index);
-
-      if (!previewSlot) {
-        previewSlot = document.createElement("img");
-        previewSlot.id = "imgPreview" + index;
-        imagePreviewBox.appendChild(previewSlot);
-      }
-
-      previewSlot.src = URL.createObjectURL(file);
+    const f = e.target.files[0];
+    if (f) {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(f);
+      imagePreviewBox.appendChild(img);
     }
   }
 });
 
-// ================= VIDEO SECTION =================
+// ================= VIDEO SECTION (itemedit.html style) =================
 const videoPreviewBox = document.getElementById("videoPreview");
 const videoInputsDiv = document.getElementById("videoInputs");
 
 for (let i = 0; i < 3; i++) {
   const label = document.createElement("label");
   label.className = "fileUpload";
-  label.innerHTML = `Upload Video ${i + 1}`;
-
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "video/*";
-  input.className = "videoInput";
-  input.dataset.index = i;
-
-  label.appendChild(input);
+  label.innerHTML = `Upload Video ${i + 1}<input type="file" class="videoInput" accept="video/*">`;
   videoInputsDiv.appendChild(label);
 }
 
 document.addEventListener("change", function(e) {
   if (e.target.classList.contains("videoInput")) {
-    const index = e.target.dataset.index;
-    const file = e.target.files[0];
-
-    if (file) {
-      let previewSlot = document.getElementById("videoPreviewSlot" + index);
-
-      if (!previewSlot) {
-        previewSlot = document.createElement("video");
-        previewSlot.id = "videoPreviewSlot" + index;
-        previewSlot.controls = true;
-        videoPreviewBox.appendChild(previewSlot);
-      }
-
-      previewSlot.src = URL.createObjectURL(file);
+    const f = e.target.files[0];
+    if (f) {
+      const v = document.createElement("video");
+      v.src = URL.createObjectURL(f);
+      v.controls = true;
+      videoPreviewBox.appendChild(v);
     }
   }
 });
@@ -616,7 +361,6 @@ const loading = document.getElementById("loading");
 document.getElementById("productForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  // ❌ double click block
   if (uploadBtn.disabled) return;
 
   const selectedCategory = localStorage.getItem("selectedCategory");
@@ -644,14 +388,13 @@ document.getElementById("productForm").addEventListener("submit", async function
     formData.append(id, document.getElementById(id).value.trim());
   });
 
-  // FIX: Send images with indexed field names
-  document.querySelectorAll(".imgInput").forEach((input, idx) => {
-    if (input.files[0]) formData.append("image" + idx, input.files[0]);
+  // ✅ Backend expects "images" and "videos" (same as itemedit.html)
+  document.querySelectorAll(".imgInput").forEach(i => {
+    if (i.files[0]) formData.append("images", i.files[0]);
   });
 
-  // FIX: Send videos with indexed field names
-  document.querySelectorAll(".videoInput").forEach((input, idx) => {
-    if (input.files[0]) formData.append("video" + idx, input.files[0]);
+  document.querySelectorAll(".videoInput").forEach(i => {
+    if (i.files[0]) formData.append("videos", i.files[0]);
   });
 
   try {
