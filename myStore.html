@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Delight.pk - My Store</title>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
   body {
     font-family: sans-serif;
@@ -12,7 +12,7 @@
     color: black;
     background-color: #e0e0e0;
     padding-bottom: 56px;
-    margin: 0;
+    margin-top: 60px;
   }
 
   /* Bottom Bar */
@@ -295,47 +295,72 @@
       margin: 0;
       color: #777;
     }
-    .bottom-bar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#ef6c00;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 0;
-  z-index:9999;
-  box-shadow:0 -2px 8px rgba(0,0,0,0.25);
-}
-.bar{position:fixed;bottom:0;left:0;width:100%;background:#ef6c00;display:flex;justify-content:space-around;align-items:center;padding:14px 0;z-index:9999;box-shadow:0 -2px 6px rgba(0,0,0,0.2);}
-.bar a{text-decoration:none;color:white;text-align:center;font-size:15px;font-weight:bold;}
-.bar i{display:block;font-size:20px;margin-bottom:3px;}
-
+    /* Views Badge */
+    .views-badge {
+      position: absolute;
+      top: 6px; left: 6px;
+      background: rgba(0,0,0,0.65);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      z-index: 2;
+    }
+    .views-badge i { font-size: 10px; color: #ffecb3; }
+    /* Bottom Bar */
+    .bar {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      background: #ef6c00;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0 8px;
+      z-index: 9999;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+    }
+    .bar a {
+      text-decoration: none;
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex: 1;
+    }
+    .bar a.active { color: #fff; }
+    .bar a.active i { color: #ffecb3; }
+    .bar i {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
   </style>
 </head>
 <body>
 
   <header>
     <h2 id="sellerName">DELIGHT.PK</h2>
-    <div class="logo1">
-      <img id="sellerLogo" src="lo.png" width="50" height="50" alt="Seller Logo">
-    </div>
   </header>
-  
-    <!-- Search -->
+
+  <div class="logo1">
+    <img id="sellerLogo" src="lo.png" alt="Seller Logo">
+  </div>
+
   <div class="search-wrap">
-    <input type="text" id="searchInput" class="search" placeholder="🔍 Search...">
+    <input type="text" id="searchInput" class="search" placeholder="🔍 Search products...">
     <button onclick="searchItems()" class="btn">Search</button>
   </div>
-  
-    <!-- Recent Search Panel -->
+
   <div id="searchPanel" class="search-panel">
     <div class="panel-header">
       <p class="recent-title">Recent Searches</p>
       <button id="clearHistoryBtn" class="clear-btn">Clear</button>
     </div>
     <ul id="recentSearches"></ul>
-
     <div class="suggestions">
       <span onclick="fillAndSearch('Tripod')">Tripod Stand</span>
       <span onclick="fillAndSearch('Wall Clock')">Wall Clock</span>
@@ -344,29 +369,24 @@
     </div>
   </div>
 
-  <div style="margin-bottom:60px;"></div>
-
   <div id="loading" class="loading">Loading products...</div>
 
   <div id="itemContainer" class="container"></div>
 
-  <!-- 🔻 Bottom Navigation Bar -->
-<div class="bar">
-  <a href="myStore.html" id="nav-store">
-    <i class="fas fa-store"></i>
-    <span>Store</span>
-  </a>
-
-  <a href="sellerOrders.html" id="nav-orders">
-    <i class="fas fa-box"></i>
-    <span>My Orders</span>
-  </a>
-
-  <a href="SellerProfile.html" id="nav-profile">
-    <i class="fas fa-user"></i>
-    <span>Profile</span>
-  </a>
-</div>
+  <div class="bar">
+    <a href="myStore.html" id="nav-store" class="active">
+      <i class="fas fa-store"></i>
+      <span>Store</span>
+    </a>
+    <a href="sellerOrders.html" id="nav-orders">
+      <i class="fas fa-box"></i>
+      <span>My Orders</span>
+    </a>
+    <a href="SellerProfile.html" id="nav-profile">
+      <i class="fas fa-user"></i>
+      <span>Profile</span>
+    </a>
+  </div>
 
   <script src="myStore.js"></script>
 </body>

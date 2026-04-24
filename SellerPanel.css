@@ -59,7 +59,7 @@ body {
     cursor:pointer;
     margin-top:20px;
     margin-right:10px;
-    margin-bottom: 120px;
+    margin-bottom: 10px;
     font-weight:bold;
   }
   .preview-container img, .preview-container video {
@@ -82,8 +82,8 @@ body {
     padding:10px;
     border-radius:8px;
     display:none;
-    margin-top:15px;
-    margin-bottom: 20px;
+    margin-top:5px;
+    margin-bottom: 60px;
   }
   /* 🔵 FULL PAGE LOADING */
 .loading-overlay{

@@ -227,6 +227,12 @@ colors.value = editItem.colors || "";
 sizes.value = editItem.sizes || "";
 description.value = editItem.description || "";
 
+// Arrays to track current images/videos
+let currentImages = [...(editItem.images || [])];
+let currentVideos = [...(editItem.videos || [])];
+let newImageFiles = [];
+let newVideoFiles = [];
+
 // ================= CATEGORY DROPDOWN LOGIC =================
 const catDisplay = document.getElementById('catDisplay');
 const catPanel = document.getElementById('catPanel');
@@ -298,50 +304,121 @@ if (savedCat) {
   });
 }
 
-// 🖼️ Images
+// ===== HELPER: Create preview item with X button =====
+function createPreviewItem(src, type, onDelete) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'preview-wrapper';
+
+  let media;
+  if (type === 'image') {
+    media = document.createElement('img');
+    media.src = src;
+  } else {
+    media = document.createElement('video');
+    media.src = src;
+    media.controls = true;
+  }
+
+  const delBtn = document.createElement('span');
+  delBtn.className = 'delete-btn';
+  delBtn.innerHTML = '✕';
+  delBtn.title = 'Remove';
+  delBtn.onclick = () => {
+    wrapper.remove();
+    onDelete();
+  };
+
+  wrapper.appendChild(media);
+  wrapper.appendChild(delBtn);
+  return wrapper;
+}
+
+// ===== RENDER IMAGES =====
+function renderImages() {
+  imagePreview.innerHTML = '';
+
+  // Old images from server
+  currentImages.forEach((src, idx) => {
+    const item = createPreviewItem(src, 'image', () => {
+      currentImages.splice(idx, 1);
+      renderImages();
+    });
+    imagePreview.appendChild(item);
+  });
+
+  // New uploaded images
+  newImageFiles.forEach((fileObj, idx) => {
+    const item = createPreviewItem(fileObj.url, 'image', () => {
+      newImageFiles.splice(idx, 1);
+      renderImages();
+    });
+    imagePreview.appendChild(item);
+  });
+}
+
+// ===== RENDER VIDEOS =====
+function renderVideos() {
+  videoPreview.innerHTML = '';
+
+  // Old videos from server
+  currentVideos.forEach((src, idx) => {
+    const item = createPreviewItem(src, 'video', () => {
+      currentVideos.splice(idx, 1);
+      renderVideos();
+    });
+    videoPreview.appendChild(item);
+  });
+
+  // New uploaded videos
+  newVideoFiles.forEach((fileObj, idx) => {
+    const item = createPreviewItem(fileObj.url, 'video', () => {
+      newVideoFiles.splice(idx, 1);
+      renderVideos();
+    });
+    videoPreview.appendChild(item);
+  });
+}
+
+// 🖼️ Image inputs
 for(let i=0;i<12;i++){
   const lbl=document.createElement("label");
   lbl.className="fileUpload";
   lbl.innerHTML=`Upload Image ${i+1}<input type="file" class="imgInput" accept="image/*">`;
   imageInputs.appendChild(lbl);
 }
-(editItem.images||[]).forEach(src=>{
-  const img=document.createElement("img");
-  img.src=src;
-  imagePreview.appendChild(img);
-});
+
+// Load existing images ONCE via renderImages
+renderImages();
+
 document.addEventListener("change",e=>{
   if(e.target.classList.contains("imgInput")){
     const f=e.target.files[0];
     if(f){
-      const img=document.createElement("img");
-      img.src=URL.createObjectURL(f);
-      imagePreview.appendChild(img);
+      const url = URL.createObjectURL(f);
+      newImageFiles.push({ file: f, url: url });
+      renderImages();
     }
   }
 });
 
-// 🎥 Videos
+// 🎥 Video inputs
 for(let i=0;i<3;i++){
   const lbl=document.createElement("label");
   lbl.className="fileUpload";
   lbl.innerHTML=`Upload Video ${i+1}<input type="file" class="videoInput" accept="video/*">`;
   videoInputs.appendChild(lbl);
 }
-(editItem.videos||[]).forEach(src=>{
-  const v=document.createElement("video");
-  v.src=src;
-  v.controls=true;
-  videoPreview.appendChild(v);
-});
+
+// Load existing videos ONCE via renderVideos
+renderVideos();
+
 document.addEventListener("change",e=>{
   if(e.target.classList.contains("videoInput")){
     const f=e.target.files[0];
     if(f){
-      const v=document.createElement("video");
-      v.src=URL.createObjectURL(f);
-      v.controls=true;
-      videoPreview.appendChild(v);
+      const url = URL.createObjectURL(f);
+      newVideoFiles.push({ file: f, url: url });
+      renderVideos();
     }
   }
 });
@@ -377,11 +454,16 @@ productForm.onsubmit = async e =>{
   fd.append("sizes",sizes.value);
   fd.append("description",description.value);
 
-  document.querySelectorAll(".imgInput").forEach(i=>{
-    if(i.files[0]) fd.append("images",i.files[0]);
+  // Send old image URLs so backend can keep them
+  fd.append("existingImages", JSON.stringify(currentImages));
+  fd.append("existingVideos", JSON.stringify(currentVideos));
+
+  // Send new files
+  newImageFiles.forEach(obj => {
+    fd.append("images", obj.file);
   });
-  document.querySelectorAll(".videoInput").forEach(i=>{
-    if(i.files[0]) fd.append("videos",i.files[0]);
+  newVideoFiles.forEach(obj => {
+    fd.append("videos", obj.file);
   });
 
   try{

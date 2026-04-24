@@ -1,22 +1,21 @@
 let allProducts = [];
 
-// 🔹 Elements
+// Elements
 const itemContainer = document.getElementById("itemContainer");
 const loading = document.getElementById("loading");
 const sellerNameEl = document.getElementById("sellerName");
 const sellerLogoEl = document.getElementById("sellerLogo");
-
-// 🔹 Search Elements
 const searchInput = document.getElementById("searchInput");
 const searchPanel = document.getElementById("searchPanel");
 const recentList = document.getElementById("recentSearches");
 const clearBtn = document.getElementById("clearHistoryBtn");
-const page = location.pathname.split("/").pop();
 
-// 🔹 Recent searches
+const API_BASE = "https://delight-backend--araindaniyalo2.replit.app";
+
+// Recent searches
 let recentSearches = JSON.parse(localStorage.getItem("recentSearches")) || [];
 
-// 🔹 Shuffle function (ONE TIME)
+// Shuffle array (Fisher-Yates)
 function shuffleArray(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -26,43 +25,42 @@ function shuffleArray(array) {
   return arr;
 }
 
-// 🔹 Load data
+// Format price (remove non-digits)
+function parsePrice(str) {
+  return parseInt(String(str).replace(/[^\d]/g, "")) || 0;
+}
+
+// Load data on page load
 document.addEventListener("DOMContentLoaded", async () => {
   const sellerPhone = localStorage.getItem("sellerPhone");
 
   if (!sellerPhone) {
-    loading.textContent = "⚠️ Seller not found!";
+    loading.textContent = "⚠️ Seller not found! Please login.";
     return;
   }
 
   try {
-    // ✅ Fetch stores
-    const storeRes = await fetch(
-      "https://delight-backend--araindaniyalo2.replit.app/all-stores"
-    );
-    const allStores = await storeRes.json();
+    // Fetch seller info
+    const storeRes = await fetch(`${API_BASE}/seller/${sellerPhone}`);
+    const storeData = await storeRes.json();
 
-    const store = allStores.find((s) => s.phone === sellerPhone);
-    if (store) {
-      sellerNameEl.textContent = store.name || "DELIGHT.PK";
-      sellerLogoEl.src = store.logo || "lo.png";
+    if (storeData.success && storeData.seller) {
+      sellerNameEl.textContent = storeData.seller.name || "DELIGHT.PK";
+      sellerLogoEl.src = storeData.seller.logo || "lo.png";
     }
 
-    // ✅ Fetch products
-    const res = await fetch(
-      `https://delight-backend--araindaniyalo2.replit.app/products/${sellerPhone}`
-    );
+    // Fetch products
+    const res = await fetch(`${API_BASE}/products/${sellerPhone}`);
     allProducts = await res.json();
 
     loading.style.display = "none";
 
-    if (!allProducts.length) {
-      itemContainer.innerHTML =
-        "<p style='text-align:center;color:#777;'>No items found.</p>";
+    if (!Array.isArray(allProducts) || !allProducts.length) {
+      itemContainer.innerHTML = `<p style="text-align:center;color:#777;width:100%;padding:40px 0;">No products found.</p>`;
       return;
     }
 
-    // ✅ SHUFFLE ONCE
+    // Shuffle once
     allProducts = shuffleArray(allProducts);
     renderProducts(allProducts);
 
@@ -72,7 +70,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// 🔹 Render Products
+// Increment view count
+async function incrementView(productId) {
+  try {
+    await fetch(`${API_BASE}/products/${productId}/view`, { method: "POST" });
+  } catch (err) {
+    console.error("View count error:", err);
+  }
+}
+
+// Render products
 function renderProducts(list) {
   itemContainer.innerHTML = "";
 
@@ -80,54 +87,55 @@ function renderProducts(list) {
     const card = document.createElement("div");
     card.className = "item-card";
 
-    const basePrice = parseInt(item.price?.replace(/[^\d]/g, "")) || 0;
-    const discount = parseInt(item.discount?.toString().replace(/[^\d]/g, "")) || 0;
+    const basePrice = parsePrice(item.price);
+    const discount = parsePrice(item.discount);
     const finalPrice = basePrice - discount;
+    const views = item.views || 0;
 
     card.innerHTML = `
-      <img src="${item.images?.[0] || 'default.jpg'}" alt="${item.title}">
+      <div class="views-badge">
+        <i class="fas fa-eye"></i>
+        <span>${views}</span>
+      </div>
+      <button class="delete-btn" title="Delete">&times;</button>
+      <img src="${item.images?.[0] || 'default.jpg'}" alt="${item.title}" loading="lazy">
       <h3>${item.title}</h3>
-
-      <p class="price-wrapper">
-        ${
-          discount > 0
-            ? `<span class="new-price">Rs. <strong>${finalPrice}</strong></span><br>
-               <span class="old-price">Rs. ${basePrice}</span>`
-            : `<span class="new-price">Rs. <strong>${basePrice}</strong></span>`
+      <div class="price-wrapper">
+        ${discount > 0
+          ? `<span class="new-price">Rs. ${finalPrice}</span>
+             <span class="old-price">Rs. ${basePrice}</span>`
+          : `<span class="new-price">Rs. ${basePrice}</span>`
         }
-      </p>
-
-      <button class="delete-btn">&times;</button>
+      </div>
     `;
 
-    // 🔹 Edit item
-    card.querySelector("img").onclick =
-    card.querySelector("h3").onclick =
-    card.querySelector(".price-wrapper").onclick = () => {
+    // Click to edit (on image, title, price - NOT delete button)
+    const openEdit = () => {
+      incrementView(item.id);
       localStorage.setItem("editItem", JSON.stringify(item));
       window.location.href = "ItemEdit.html";
     };
 
-    // 🔹 Delete item
+    card.querySelector("img").onclick = openEdit;
+    card.querySelector("h3").onclick = openEdit;
+    card.querySelector(".price-wrapper").onclick = openEdit;
+
+    // Delete product
     card.querySelector(".delete-btn").addEventListener("click", async (e) => {
       e.stopPropagation();
-
       if (!confirm(`Delete "${item.title}"?`)) return;
 
       try {
-        const res = await fetch(
-          `https://delight-backend--araindaniyalo2.replit.app/products/${item.id}`,
-          { method: "DELETE" }
-        );
-
+        const res = await fetch(`${API_BASE}/products/${item.id}`, {
+          method: "DELETE"
+        });
         const data = await res.json();
 
         if (data.success) {
           allProducts = allProducts.filter(p => p.id !== item.id);
           renderProducts(allProducts);
-          alert("✅ Product deleted");
         } else {
-          alert("⚠️ Failed to delete");
+          alert("⚠️ Failed to delete product");
         }
       } catch (err) {
         console.error(err);
@@ -139,12 +147,12 @@ function renderProducts(list) {
   });
 }
 
-// 🔹 Recent Searches
+// Render recent searches
 function renderRecentSearches() {
   recentList.innerHTML = "";
 
   if (recentSearches.length === 0) {
-    recentList.innerHTML = "<li style='color:#999;'>No recent searches</li>";
+    recentList.innerHTML = `<li style="color:#999;padding:10px 8px;">No recent searches</li>`;
     return;
   }
 
@@ -156,20 +164,20 @@ function renderRecentSearches() {
   });
 }
 
-// 🔹 Search panel open
+// Search panel - open on focus
 searchInput.addEventListener("focus", () => {
   renderRecentSearches();
   searchPanel.classList.add("active");
 });
 
-// 🔹 Click outside to close
+// Close panel on outside click
 document.addEventListener("click", (e) => {
   if (!searchPanel.contains(e.target) && e.target !== searchInput) {
     searchPanel.classList.remove("active");
   }
 });
 
-// 🔹 Enter key press
+// Enter key search
 searchInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -177,11 +185,12 @@ searchInput.addEventListener("keydown", (e) => {
   }
 });
 
-// 🔹 Search function
+// Search function
 function searchItems() {
   const term = searchInput.value.trim().toLowerCase();
   if (!term) return;
 
+  // Save to recent
   if (!recentSearches.includes(term)) {
     recentSearches.unshift(term);
     if (recentSearches.length > 6) recentSearches.pop();
@@ -193,7 +202,7 @@ function searchItems() {
   searchPanel.classList.remove("active");
 }
 
-// 🔹 Filter Products
+// Filter products
 function filterProducts(term) {
   const matched = allProducts.filter(p =>
     p.title.toLowerCase().includes(term)
@@ -201,9 +210,9 @@ function filterProducts(term) {
 
   if (!matched.length) {
     itemContainer.innerHTML = `
-      <div class="not-found" style="margin:140px 0 0 40px;">
-        <img src="Delight icons/not-found.png">
-        <h3 style="color:#fe7004;">Oops! Item Not Found.</h3>
+      <div class="not-found">
+        <img src="Delight icons/not-found.png" alt="Not found">
+        <h3>Oops! Item Not Found.</h3>
         <p>Try searching with a different keyword.</p>
       </div>`;
     return;
@@ -212,25 +221,15 @@ function filterProducts(term) {
   renderProducts(matched);
 }
 
-// 🔹 Fill search input & search
+// Fill search and trigger
 function fillAndSearch(term) {
   searchInput.value = term;
   searchItems();
 }
 
-// 🔹 Clear recent history
+// Clear history
 clearBtn.addEventListener("click", () => {
   localStorage.removeItem("recentSearches");
   recentSearches = [];
   renderRecentSearches();
 });
-
-  if(page === "myStore.html") {
-    document.getElementById("nav-store")?.classList.add("active");
-  }
-  if(page === "sellerOrders.html") {
-    document.getElementById("nav-orders")?.classList.add("active");
-  }
-  if(page === "SellerProfile.html") {
-    document.getElementById("nav-profile")?.classList.add("active");
-  }
