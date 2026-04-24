@@ -5,6 +5,8 @@ body {
     max-width:600px;
     margin:auto;
     margin-right: 12px;
+    margin-bottom: 60px;
+    margin-top: 50px;
   }
   h3 {
     color:#ef6c00;
@@ -118,7 +120,8 @@ button:disabled{
   /* ===== CATEGORY SELECTOR STYLES ===== */
   .cat-dropdown {
     position:relative;
-    width:100%;
+    width:350;
+    margin-top: 6px;
   }
   .cat-display {
     width:100%;
@@ -214,28 +217,21 @@ button:disabled{
   .overlay-backdrop.open {
     display:block;
   }
-  .bar{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:#ef6c00;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  padding:14px 0;
-  z-index:9999;
-  box-shadow:0 -2px 6px rgba(0,0,0,0.2);
+ /* Header */
+header {
+  position:fixed; top:0; left:0; width:100%;
+  background:linear-gradient(135deg,#ff6a00,#ff3d00);
+  display:flex; align-items:center; justify-content:center;
+  height:65px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.15);
+  border-bottom-left-radius:35px; border-bottom-right-radius:35px;
+  z-index:10;
 }
-.bar a{
-  text-decoration:none;
-  color:white;
-  text-align:center;
-  font-size:15px;
-  font-weight:bold;
+.back-btn {
+  position:absolute; left:18px; top:50%; transform:translateY(-50%);
+  background:rgba(255,255,255,0.9); border-radius:50%; width:38px; height:38px;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  cursor:pointer;
 }
-.bar i{
-  display:block;
-  font-size:20px;
-  margin-bottom:3px;
-}
+.back-btn img { width:22px; height:22px; }
+header h4 { color:#fff; font-size:21px; font-weight:600; text-shadow:0 1px 3px rgba(0,0,0,0.25); }
