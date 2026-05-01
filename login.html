@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="login.css">
+  <title>www.delight.pk - Login</title>
+</head>
+<body>
+  <div class="delight">
+    <h2>Welcome Back 👋</h2>
+    <h2>TO</h2>
+    <h1>DELIGHT SHOP🛍</h1>
+  </div>
+
+  <div class="logo">
+    <img src="Delight icons/Logo.png" width="200" height="200" alt="Delight.logo">
+  </div>
+
+  <div class="login">
+    <h3>Login</h3>
+    <form id="loginForm">
+      <input type="number" id="phone" required placeholder="Enter your phone number" minlength="11" maxlength="11"><br>
+      
+      <!-- 👁️ Eye Toggle Password -->
+      <div class="password-wrapper">
+        <input type="password" id="pass" required placeholder="Enter your password">
+        <span class="toggle-password" onclick="togglePassword()">
+          <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </div><br>
+      
+      <input type="submit" value="Login">
+    </form>
+
+    <p style="margin-top:12px; font-size:13px; text-align:center;">
+      Don't have an account?
+      <a href="signup.html" style="color:#ef6c00; text-decoration:none; font-weight:bold;">
+        ✍️ Sign Up
+      </a>
+    </p>
+  </div>
+
+  <script>
+    // 👁️ Eye Toggle Function
+    function togglePassword() {
+      const passInput = document.getElementById("pass");
+      const eyeIcon = document.getElementById("eyeIcon");
+      
+      if (passInput.type === "password") {
+        passInput.type = "text";
+        // Eye-off icon (slash wala)
+        eyeIcon.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+      } else {
+        passInput.type = "password";
+        // Eye icon (normal)
+        eyeIcon.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        `;
+      }
+    }
+
+    const form = document.getElementById("loginForm");
+
+    form.addEventListener("submit", async function(event){
+      event.preventDefault();
+
+      const phone = document.getElementById("phone").value.trim();
+      const pass = document.getElementById("pass").value.trim();
+
+      if (phone.length !== 11 || pass.length < 6) {
+        alert("⚠️ Please enter valid phone and password!");
+        return;
+      }
+
+      const payload = { phone, password: pass };
+
+      try {
+        const baseUrl = "https://delight-backend--araindaniyalo2.replit.app";
+        
+        // Step 1: Login user
+        const res = await fetch(baseUrl + "/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        console.log("Login response:", data);
+
+        if (res.ok && data.success) {
+          // Save user data
+          const sellerData = { 
+            id: data.user.id,
+            name: data.user.name,
+            phone: data.user.phone
+          };
+          
+          localStorage.setItem("seller", JSON.stringify(sellerData));
+          localStorage.setItem("token", data.token);
+          
+          console.log("Saved to localStorage:", sellerData);
+
+          // ✅ Step 2: Check if seller exists in database
+          try {
+            const checkRes = await fetch(baseUrl + "/seller/" + data.user.phone);
+            const checkData = await checkRes.json();
+            console.log("Seller check:", checkData);
+
+            if (!checkData.success) {
+              // Seller not found, create seller in database
+              console.log("Creating seller in database...");
+              
+              const sellerSignupRes = await fetch(baseUrl + "/seller-signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: data.user.name,
+                  phone: data.user.phone,
+                  password: pass // Same password as user login
+                })
+              });
+              
+              const sellerData = await sellerSignupRes.json();
+              console.log("Seller created:", sellerData);
+            }
+          } catch(e) {
+            console.log("Seller check/create error:", e);
+          }
+
+          alert("✅ Login successful!");
+          window.location.href = "SP.Name.html";
+        } else {
+          alert(data.message || "❌ Invalid credentials. Try again.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Error connecting to backend.");
+      }
+    });
+  </script>
+</body>
+</html>
