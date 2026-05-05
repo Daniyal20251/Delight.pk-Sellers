@@ -75,6 +75,102 @@ button{width:100%;background:#ef6c00;color:white;border:none;padding:12px 0;bord
 button:hover{background:#d55c00;}
 #welcomeText{text-align:center;margin-top:15px;color:#ef6c00;font-size:18px;font-weight:bold;}
 
+/* ===== NOTIFICATION BADGE ===== */
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: 6px;
+  background: #ff3d00;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 6px rgba(255, 61, 0, 0.4);
+  animation: pulse-badge 2s infinite;
+  z-index: 10;
+}
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+/* ===== TOAST NOTIFICATION ===== */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 90%;
+  max-width: 400px;
+}
+.toast {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: slideDown 0.4s ease, fadeOut 0.4s ease 4.6s forwards;
+  border-left: 5px solid #ff6a00;
+  position: relative;
+  overflow: hidden;
+}
+.toast::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff6a00, #ff3d00);
+  animation: progress 5s linear forwards;
+}
+@keyframes slideDown {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(-20px); }
+}
+@keyframes progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+.toast-icon {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #ff6a00, #ff3d00);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.toast-content { flex: 1; }
+.toast-title {
+  font-weight: 700;
+  color: #222;
+  font-size: 15px;
+  margin-bottom: 3px;
+}
+.toast-msg {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 /* ===== PROFESSIONAL BOTTOM BAR ===== */
 .bar{
   position:fixed;
@@ -172,6 +268,9 @@ button:hover{background:#d55c00;}
   <div class="loader-text">Loading Profile...</div>
 </div>
 
+<!-- Toast Notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
 <div class="container" id="mainContainer">
   <h2>My Profile</h2>
 
@@ -211,9 +310,10 @@ button:hover{background:#d55c00;}
     <i class="fas fa-store"></i>
     Store
   </a>
-  <a href="sellerOrders.html" onclick="goToOrders()">
+  <a href="sellerOrders.html" onclick="goToOrders()" id="nav-orders">
     <i class="fas fa-box"></i>
     My Orders
+    <span class="nav-badge" id="orderBadge" style="display:none;">0</span>
   </a>
   <a href="SellerProfile.html" class="active">
     <i class="fas fa-user"></i>
@@ -241,10 +341,68 @@ if(!seller){
   window.location.href="signup.html";
 }
 
+// ===== NOTIFICATION SYSTEM =====
+let lastOrderCount = 0;
+let checkedOnce = false;
+
+function showToast(title, message, icon = "fa-bell") {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  toast.innerHTML = `
+    <div class="toast-icon"><i class="fas ${icon}"></i></div>
+    <div class="toast-content">
+      <div class="toast-title">${title}</div>
+      <div class="toast-msg">${message}</div>
+    </div>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+
+function updateBadge(count) {
+  const badge = document.getElementById("orderBadge");
+  if (!badge) return;
+  
+  if (count > 0) {
+    badge.textContent = count > 99 ? "99+" : count;
+    badge.style.display = "flex";
+    
+    if (checkedOnce && count > lastOrderCount) {
+      const newOrders = count - lastOrderCount;
+      showToast(
+        "🛒 New Order" + (newOrders > 1 ? "s" : "") + "!", 
+        `${newOrders} new order${newOrders > 1 ? 's' : ''} received. Ship them now!`,
+        "fa-box-open"
+      );
+    }
+  } else {
+    badge.style.display = "none";
+  }
+  
+  lastOrderCount = count;
+  checkedOnce = true;
+}
+
+async function checkNewOrders() {
+  try {
+    const res = await fetch(`https://delight-backend--araindaniyalo2.replit.app/seller-orders/${seller.phone}`);
+    const orders = await res.json();
+    
+    if (!orders || !Array.isArray(orders)) return;
+    
+    const pendingCount = orders.filter(o => o.status === "Pending").length;
+    updateBadge(pendingCount);
+    
+  } catch (err) {
+    console.error("Order check failed:", err);
+  }
+}
+
 // Generate Store Link
 function generateStoreLink(){
   const phone = seller.phone;
-  const link = `https://delightpk.qzz.io/Store.html?phone=${phone}`;
+  const link = `https://delightpk.qz.io/Store.html?phone=${phone}`;
   storeLink.href = link;
   storeLink.innerText = link;
   storeLinkBox.style.display = "block";
@@ -277,6 +435,7 @@ async function loadSettings(){
     if(data.delivery){ deliveryInput.value = data.delivery; }
 
     generateStoreLink();
+    await checkNewOrders();
 
   }catch(err){ console.error(err); }
 }
@@ -285,7 +444,6 @@ async function loadSettings(){
 window.addEventListener("load", async () => {
   await loadSettings();
 
-  // Hide loader after minimum 1 second for smooth feel
   setTimeout(() => {
     loaderOverlay.classList.add("hidden");
     mainContainer.classList.add("loaded");
@@ -335,6 +493,9 @@ function logout(){
   localStorage.removeItem("seller");
   window.location.href="login.html"; 
 }
+
+// Real-time polling
+setInterval(checkNewOrders, 10000);
 </script>
 
 </body>
