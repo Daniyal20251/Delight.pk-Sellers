@@ -493,6 +493,12 @@ productForm.onsubmit = async e =>{
   loading.style.display = "none";
 };
 </script>
+<script>
+(function() {
+  const isDark = localStorage.getItem("darkMode") === "true";
+  if (isDark) document.documentElement.setAttribute("data-theme", "dark");
+})();
+</script>
 
 </body>
 </html>

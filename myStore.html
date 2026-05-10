@@ -6,11 +6,106 @@
   <title>Delight.pk - My Store</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-  body {
+:root {
+  --bg-body: #e0e0e0;
+  --bg-card: #fff;
+  --bg-input: #fafafa;
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-heading: #ef6c00;
+  --border-color: #ddd;
+  --shadow-card: 0 4px 14px rgba(0,0,0,0.1);
+  --bottom-bar-bg: #fff;
+  --bottom-bar-border: #f0f0f0;
+  --bottom-bar-text: #999;
+}
+
+[data-theme="dark"] {
+  --bg-body: #0a0a1a;
+  --bg-card: #16162a;
+  --bg-input: #1e1e3a;
+  --text-primary: #e8e8f0;
+  --text-secondary: #a0a0c0;
+  --text-heading: #ff8c00;
+  --border-color: #2a2a4a;
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.5);
+  --bottom-bar-bg: #16162a;
+  --bottom-bar-border: #2a2a4a;
+  --bottom-bar-text: #8888aa;
+}
+
+/* Smooth transitions for all theme changes */
+* {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ===== DARK MODE TOGGLE BUTTON ===== */
+.theme-switch-wrapper {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-switch {
+  position: relative;
+  width: 56px;
+  height: 30px;
+  background: linear-gradient(135deg, #ff6a00, #ff3d00);
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(239, 108, 0, 0.3), inset 0 1px 3px rgba(255,255,255,0.2);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 2px solid transparent;
+}
+
+.theme-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.theme-switch .switch-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-switch .switch-sun { left: 8px; color: #fff; opacity: 1; }
+.theme-switch .switch-moon { right: 8px; color: #fff; opacity: 0.5; }
+
+[data-theme="dark"] .theme-switch {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3), inset 0 1px 3px rgba(255,255,255,0.1);
+}
+
+[data-theme="dark"] .theme-switch::before {
+  left: calc(100% - 26px);
+  background: #1e1e3a;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .theme-switch .switch-sun { opacity: 0.5; }
+[data-theme="dark"] .theme-switch .switch-moon { opacity: 1; }
+
+body {
     font-family: sans-serif;
     padding-top: 25px;
-    color: black;
-    background-color: #e0e0e0;
+    color: var(--text-primary);
+    background-color: var(--bg-body);
     padding-bottom: 56px;
     margin-top: 60px;
   }
@@ -21,19 +116,19 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    background: #fff;
+    background: var(--bottom-bar-bg);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding: 10px 0 12px;
     z-index: 9999;
     box-shadow: 0 -4px 14px rgba(0,0,0,0.08);
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--bottom-bar-border);
   }
 
   .bar a {
     text-decoration: none;
-    color: #999;
+    color: var(--bottom-bar-text);
     text-align: center;
     font-size: 11px;
     font-weight: 600;
@@ -53,11 +148,11 @@
   }
 
   .bar a:hover {
-    color: #ef6c00;
+    color: var(--text-heading);
   }
 
   .bar a.active {
-    color: #ef6c00;
+    color: var(--text-heading);
   }
 
   .bar a.active::before {
@@ -68,7 +163,7 @@
     transform: translateX(-50%);
     width: 32px;
     height: 3px;
-    background: #ef6c00;
+    background: var(--text-heading);
     border-radius: 2px;
   }
 
@@ -127,11 +222,11 @@
     cursor: pointer;
     width: 48%;
     height: 250px;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     margin-bottom: 12px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-card);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -152,7 +247,7 @@
     font-size: 11px;
     padding-left: 4px;
     font-weight: normal;
-    color: #333;
+    color: var(--text-primary);
     margin: 3px 0 0 4px;
     text-transform: capitalize;
   }
@@ -168,7 +263,7 @@
 
   .new-price {
     font-weight: bold;
-    color: #ef6c00;
+    color: var(--text-heading);
     display: flex;
     align-items: baseline;
     margin: 0;
@@ -181,7 +276,7 @@
 
   .old-price {
     font-size: 13px;
-    color: #888;
+    color: var(--text-secondary);
     text-decoration: line-through;
     display: flex;
     align-items: baseline;
@@ -210,7 +305,7 @@
   }
 
   .delete-btn:hover { background: #d9363e; }
-  
+
   .search {
   position: fixed;
   padding-left: 5px;
@@ -224,6 +319,8 @@
   width: 20px;
   transition: width 2s;
   z-index: 9998;
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 .search:hover {
@@ -239,7 +336,7 @@
   border: none;
   border-radius: 20px;
   border: 2px solid white;
-  background-color: #ef6c00;
+  background-color: var(--text-heading);
   color: white;
   width: 70px;
   z-index: 9998;
@@ -249,8 +346,8 @@
   top: 85px;
   left: 0;
   width: 100%;
-  background: #fff;
-  border-top: 1px solid #ddd;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-color);
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   z-index: 9999;
   display: none;
@@ -273,7 +370,7 @@
   background: red;
   color: white;
   border: none;
-  padding: 5px 10px ;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
   margin-right: 17px;
@@ -281,21 +378,22 @@
 
 .recent-title {
   font-weight: bold;
-  color: #ef6c00;
-  margin: 0 ;
+  color: var(--text-heading);
+  margin: 0;
 }
 
 #recentSearches li {
   list-style: none;
   padding: 8px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   font-size: 14px;
   margin-right: 70px;
+  color: var(--text-primary);
 }
 
 #recentSearches li:hover {
-  background: #f5f5f5;
+  background: var(--bg-input);
 }
 .suggestions {
   margin-top: 10px;
@@ -303,8 +401,8 @@
 
 .suggestions span {
   display: inline-block;
-  background: #f1f1f1;
-  color: #333;
+  background: var(--bg-input);
+  color: var(--text-primary);
   padding: 6px 10px;
   border-radius: 20px;
   margin: 5px 5px 0 0;
@@ -313,12 +411,12 @@
 }
 
 .suggestions span:hover {
-  background: #ddd;
+  background: var(--border-color);
 }
 .not-found {
       text-align: center;
       margin-top: 50px;
-      color: #555;
+      color: var(--text-secondary);
     }
     .not-found img {
       width: 180px;
@@ -330,10 +428,11 @@
       margin: 8px 0 5px;
       font-size: 20px;
       font-weight: 600;
+      color: var(--text-primary);
     }
     .not-found p {
       margin: 0;
-      color: #777;
+      color: var(--text-secondary);
     }
     /* Views Badge */
     .views-badge {
@@ -350,6 +449,7 @@
       z-index: 2;
     }
     .views-badge i { font-size: 10px; color: #ffecb3; }
+
   </style>
 </head>
 <body>
@@ -400,7 +500,13 @@
       <span>Profile</span>
     </a>
   </div>
-
   <script src="myStore.js"></script>
+  <script>
+(function() {
+  const isDark = localStorage.getItem("darkMode") === "true";
+  if (isDark) document.documentElement.setAttribute("data-theme", "dark");
+})();
+</script>
+
 </body>
 </html>

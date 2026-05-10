@@ -6,13 +6,113 @@
 <title>Delight PK - Product Details</title>
 
 <style>
+:root {
+  --bg-body: #f8f8f8;
+  --bg-card: #fff;
+  --bg-input: #fafafa;
+  --bg-desc: #fff7ef;
+  --bg-info: #ffeedb;
+  --text-primary: #333;
+  --text-secondary: #444;
+  --text-heading: #ef6c00;
+  --border-color: #ddd;
+  --shadow-card: 0 3px 10px rgba(0,0,0,0.1);
+  --bottom-bar-bg: #fff;
+  --bottom-bar-border: #f0f0f0;
+  --bottom-bar-text: #999;
+}
+
+[data-theme="dark"] {
+  --bg-body: #0a0a1a;
+  --bg-card: #16162a;
+  --bg-input: #1e1e3a;
+  --bg-desc: #1a1a2e;
+  --bg-info: #1e1e3a;
+  --text-primary: #e8e8f0;
+  --text-secondary: #a0a0c0;
+  --text-heading: #ff8c00;
+  --border-color: #2a2a4a;
+  --shadow-card: 0 4px 20px rgba(0,0,0,0.5);
+  --bottom-bar-bg: #16162a;
+  --bottom-bar-border: #2a2a4a;
+  --bottom-bar-text: #8888aa;
+}
+
+/* Smooth transitions for all theme changes */
+* {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ===== DARK MODE TOGGLE BUTTON ===== */
+.theme-switch-wrapper {
+  position: fixed;
+  top: 18px;
+  left: 18px;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-switch {
+  position: relative;
+  width: 56px;
+  height: 30px;
+  background: linear-gradient(135deg, #ff6a00, #ff3d00);
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(239, 108, 0, 0.3), inset 0 1px 3px rgba(255,255,255,0.2);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 2px solid transparent;
+}
+
+.theme-switch::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.theme-switch .switch-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.theme-switch .switch-sun { left: 8px; color: #fff; opacity: 1; }
+.theme-switch .switch-moon { right: 8px; color: #fff; opacity: 0.5; }
+
+[data-theme="dark"] .theme-switch {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3), inset 0 1px 3px rgba(255,255,255,0.1);
+}
+
+[data-theme="dark"] .theme-switch::before {
+  left: calc(100% - 26px);
+  background: #1e1e3a;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+[data-theme="dark"] .theme-switch .switch-sun { opacity: 0.5; }
+[data-theme="dark"] .theme-switch .switch-moon { opacity: 1; }
+
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: #f8f8f8;
+  background: var(--bg-body);
+  color: var(--text-primary);
 }
 
-/* 🔹 Header */
+/* Header */
 header {
   position: fixed;
   top: 0;
@@ -53,7 +153,7 @@ header h4 {
   font-weight: 600;
 }
 
-/* 🔹 Container */
+/* Container */
 .container {
   margin-top: 70px;
   padding: 15px;
@@ -62,66 +162,67 @@ header h4 {
   margin-right: auto;
 }
 
-/* 🔹 Image */
+/* Image */
 .product-image {
   width: 100%;
   border-radius: 14px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-card);
 }
 
-/* 🔹 Details Box */
+/* Details Box */
 .details {
-  background: #fff;
+  background: var(--bg-card);
   padding: 15px;
   border-radius: 14px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-card);
   margin-top: 15px;
 }
 
 .details h2 {
   font-size: 18px;
   margin: 0;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .price {
   font-size: 18px;
   font-weight: 600;
-  color: #ff3d00;
+  color: var(--text-heading);
   margin: 10px 0;
 }
 
-/* 🔹 Info Badges */
+/* Info Badges */
 .info-box {
   display: inline-block;
   padding: 6px 10px;
-  background: #ffeedb;
+  background: var(--bg-info);
   border-radius: 8px;
   margin-right: 6px;
   margin-bottom: 6px;
-  color: #333;
+  color: var(--text-primary);
   font-size: 13px;
   font-weight: 500;
 }
 
-/* 🔹 Description Box */
+/* Description Box */
 .desc {
-  background: #fff7ef;
+  background: var(--bg-desc);
   padding: 12px;
   border-radius: 10px;
   margin-top: 12px;
-  border-left: 4px solid #ff6a00;
+  border-left: 4px solid var(--text-heading);
 }
 
 .desc h3 {
   font-size: 15px;
   margin-bottom: 8px;
+  color: var(--text-primary);
 }
 
 .desc p {
   font-size: 14px;
   line-height: 1.6;
-  color: #444;
+  color: var(--text-secondary);
 }
 
 .desc ul {
@@ -132,9 +233,10 @@ header h4 {
 .desc ul li {
   font-size: 14px;
   line-height: 1.6;
-  color: #444;
+  color: var(--text-secondary);
   margin-bottom: 6px;
 }
+
 </style>
 </head>
 
@@ -221,6 +323,12 @@ window.onload = () => {
     </div>
   `;
 };
+</script>
+<script>
+(function() {
+  const isDark = localStorage.getItem("darkMode") === "true";
+  if (isDark) document.documentElement.setAttribute("data-theme", "dark");
+})();
 </script>
 
 </body>

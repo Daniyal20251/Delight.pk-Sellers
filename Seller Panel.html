@@ -22,13 +22,13 @@
   <input type="text" id="price" placeholder="999">
 
   <label>Discount (Rs.):</label>
-  <input type="text" id="discount" placeholder="100 (Optional)">
+  <input type="text" id="discount" placeholder="100">
 
   <label>Color:</label>
-  <input type="text" id="colors" placeholder="Example: Red, Blue, Black (Optional)">
+  <input type="text" id="colors" placeholder="Example: Red, Blue, Black">
 
   <label>Size:</label>
-  <input type="text" id="sizes" placeholder="Example: Small, Medium, Large (Optional)">
+  <input type="text" id="sizes" placeholder="Example: Small, Medium, Large">
 
   <label>Description:</label>
   <textarea id="description" rows="6" placeholder="Product description here..."></textarea>
@@ -431,6 +431,12 @@ document.getElementById("productForm").addEventListener("submit", async function
   uploadBtn.disabled = false;
   loading.style.display = "none";
 });
+</script>
+<script>
+(function() {
+  const isDark = localStorage.getItem("darkMode") === "true";
+  if (isDark) document.documentElement.setAttribute("data-theme", "dark");
+})();
 </script>
 
 </body>
